@@ -1,0 +1,2 @@
+PKG_LIBS = -L../lib -lmeshsimplification -Wl,-rpath,$(PWD)/lib
+PKG_CPPFLAGS = -std=c++11 -I../include/ -I../include/meshsimplification/ -I../lib/Eigen

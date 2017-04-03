@@ -1,0 +1,5 @@
+useDynLib(MeshDataSimplification)
+exportPattern("^[[:alpha:]]+")
+import(methods, Rcpp)
+export(initialize.simplification, run.simplification)
+export(get.nodes, get.elems, get.data, get.quantity.of.information)

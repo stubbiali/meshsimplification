@@ -1,0 +1,73 @@
+Note on Rcpp
+
+To load a package in R: library(<package>) --> e.g. library(Rcpp)
+To load another R script/function: suorce("<script>")
+To load and compile a C++ file: Rcpp::sourceCpp("<file>")
+
+cppFunction: allows to write C++ code for a function directly in a R file
+The code is then automatically compiled and an R function connected to the
+C++ function is created
+e.g. cppFunction('int add(int x, int y, int z) {
+  int sum = x + y + z;
+  return sum;
+}')
+Then, in R we can call: add(1,2,3)
+
+Classes for R vectors in Rcpp: 
+- NumericVector (double)
+- IntegerVector (int)
+- CharacterVector (String)
+- LogicalVector (bool)
+--> To access elements: use []
+--> 0-based index
+
+To declare a function in R:
+<output> <- <function_name>(<input>) { <body> }
+--> no return statement within the body of the function
+
+if and while: equal in C++ and R
+continue in C++ == next in R
+
+To know the size of a vector v: v.size()
+
+Constructor for a vector, e.g. NumericVector:
+- NumericVector v(n);
+- NumericVector v = clone(v1);
+
+Each vector type has a matrix equivalent:
+- NumericMatrix
+- IntegerMatrix
+- CharacterMatrix
+- LogicalMatrix
+--> To get the number of rows and columns: M.nrow(), M.ncol()
+--> To access elements: use () instead of []
+
+In the C++ file, always include:
+	#include <Rcpp.h>
+	using namespace Rcpp;
+	
+Each function we want to be available in R must be decorated with
+// [[Rcpp::export]]
+
+In a C++ file, one can also include R code, e.g. for small tests:
+/*** R
+# Code
+*/
+
+Note: sourceCpp should be run each time we restart R, i.e. it cannot be saved
+
+To perform some tests in R:
+library(microbenchmark)
+microbenchmark(
+	<functions we want to compare separted by commas>
+)
+
+To create a NumericVector out of scalars:
+	NumericVector v = NumericVector::create(1,2,3)
+--> The same holds for the other types of vectors
+
+Each object may have names and attributes. For instance, suppose out is a
+NumericVector storing 1,2,3:
+	out.names() = CharacterVector::create("a", "b", "c");
+  	out.attr("my-attr") = "my-value";
+  	out.attr("class") = "my-class";

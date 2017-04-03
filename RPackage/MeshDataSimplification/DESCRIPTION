@@ -1,0 +1,40 @@
+Package: MeshDataSimplification
+Version: 0.1
+Date: 2017-04-01
+Title: Simplification Strategy For Surface Grids With Distributed Data
+Authors@R: c(
+	person("Franco", "Dassi", 
+		email = "", role = "aut"),
+	person("Bree", "Ettinger", 
+		email = "", role = "aut"),
+	person("Marco", "Martinolli", 
+		email = "marco.martinolli@mail.polimi.it", role = "aut"),
+	person("Simona", "Perotto", 
+		email = "simona.perotto@polimi.it", role = "aut"),
+	person("Laura M.", "Sangalli", 
+		email = "laura.sangalli@polimi.it", role = "aut"),
+	person("Stefano", "Ubbiali", 
+		email = "stefano.ubbiali@mail.polimi.it", role = c("aut","cre")))
+Author:
+	Franco Dassi [aut],
+	Bree Ettinger [aut],
+	Marco Martinolli [aut],
+	Simona Perotto [aut],
+	Laura M. Sangalli [aut],
+	Stefano Ubbiali [aut, cre]
+Maintainer: Stefano Ubbiali <stefano.ubbiali@mail.polimi.it>
+Depends: 
+	R (>= 3.0.0)
+LinkingTo: 
+	Rcpp (>= 0.9.11)
+Description: An iterative edge collapse-based simplification strategy for 
+	triangular surface grids with distributed data. For the selection of the
+	edge to contract at each iteration, an edge cost function is introduced,
+	acconting for geometric and statistical considerations. The library can 
+	handle both genus zero and higher genus surfaces.
+License:
+Copyright:
+NeedsCompilation: yes
+SystemRequirements: C++11
+RoxygenNote: 6.0.1
+
