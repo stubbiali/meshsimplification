@@ -14,13 +14,12 @@ C++ LIBRARY
 The main output is the meshsimplification library.
 The C++ code for the library, as well as that one for the applications
 and the tests, comes with the following folders:
-
-	- include/	header files for the meshsimplification library
-	- src/		source files for the meshsimplification library
-	- main/		source files for the applications
-	- test/		source files for the tests
-	- spike/	extra code which may turn out to be useful in the future
-	- lib/		third-party libraries required by the code
+-  include/	header files for the meshsimplification library
+-  src/		source files for the meshsimplification library
+-  main/	source files for the applications
+-  test/	source files for the tests
+-  spike/	extra code which may turn out to be useful in the future
+-  lib/		third-party libraries required by the code
 	
 To compile the library meshsimplification.so and compile and link the
 applications using the GNU C++ compiler, from the project root folder type:
