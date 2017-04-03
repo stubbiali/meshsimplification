@@ -3,7 +3,8 @@ surface grids with data distributed over the surface
 =====================================================================
 
 For a detailed description of the method, please refer to:
-Dassi F., Ettinger B., Perotto S., Sangalli L. M.
+
+[1] Dassi F., Ettinger B., Perotto S., Sangalli L. M.
 "A mesh simplification strategy for a spatial regression analysis
 over the cortical surface of the brain". 
 Applied Numerical Mathematics 90:111-131, 2015.
