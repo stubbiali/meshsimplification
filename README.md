@@ -78,32 +78,40 @@ Finally, `results/` contains some results obtained using the aforementioned libr
 R PACKAGE
 ------------------------------------------------------------------------------
 
-This project comes also with the R package MeshDataSimplification, wrapping the C++ 
-library meshsimplification, thus providing a high-level access to its functionalities.
-To expose the C++ code to R, the Rcpp API is used, so make sure you have the Rcpp
+This project comes also with the R package `MeshDataSimplification`, wrapping the C++ 
+library `meshsimplification`, thus providing a high-level access to its functionalities.
+To expose the C++ code to R, the `Rcpp` API is used, so make sure you have the `Rcpp`
 package correctly installed.
-The source code for the package is placed in the folder RPackage/MeshDataSimplification
+
+The source code for the package is placed in the folder `RPackage/MeshDataSimplification`
 and its subfolders, namely:
-	include		C++ header files for the package and for the meshsimplification library 
-				(meshsimplification/) 
-	src			C++ source files
-	R			R source files
-	lib			the Eigen (Eigen/) and meshsimplification library
+- `include` : C++ header files for the package and for the `meshsimplification` library (`include/meshsimplification/`);
+- `src` : C++ source files;
+- `R` : R source files;
+- `lib` : the Eigen (`lib/Eigen/`) and `meshsimplification` library.
 	
-Note that the headers for the meshsimplification library, as well as the library itself,
-are automatically placed in the respective locations within RPackage/MeshDataSimplification 
+Note that the headers for the `meshsimplification` library, as well as the library itself,
+are automatically placed in the respective locations within `RPackage/MeshDataSimplification`
 every time the commands
-	make, make dynamic, make tests 
+
+	make, make dynamic, make tests
+	 
 are invoked.
 
-In order to build, compile and install the package, first install the meshsimplification library
+In order to build, compile and install the package, first install the `meshsimplification` library
 through
+
 	make install
-from the project root folder. Then, move to the RPackage/MeshDataSimplification folder and type:
+	
+from the project root folder. Then, move to the `RPackage/MeshDataSimplification` folder and type:
+
 	sudo R -e "library(devtools); install()" --silent
-Observe that the R package devtools is required.
-Furthermore, to build the Roxygen documentation and place it in RPackage/MeshDataSimplification/man,
+	
+Observe that the R package `devtools` is required.
+
+Lastly, to build the Roxygen documentation and place it in `RPackage/MeshDataSimplification/man/`,
 run
+
 	R -e "library(devtools); document()" --silent
 
 
