@@ -8,7 +8,7 @@ Dassi F., Ettinger B., Perotto S., Sangalli L. M.
 over the cortical surface of the brain". 
 Applied Numerical Mathematics 90:111-131, 2015.
     
-C++ LIBRARY
+C++ library
 ---------------------------------------------------------------------
 
 The main output is the `meshsimplification` library.
@@ -75,7 +75,7 @@ Example grids can be found in the folder `mesh/` while `post_processing/`
 stores MATLAB datasets and scripts for postprocessing. 
 Finally, `results/` contains some results obtained using the aforementioned library.
 
-R PACKAGE
+R package
 ------------------------------------------------------------------------------
 
 This project comes also with the R package `MeshDataSimplification`, wrapping the C++ 
