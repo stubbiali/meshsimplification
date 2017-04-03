@@ -14,7 +14,7 @@ C++ LIBRARY
 The main output is the meshsimplification library.
 The C++ code for the library, as well as that one for the applications
 and the tests, comes with the following folders:
-- '<include/>' : header files for the meshsimplification library
+- 'include/' : header files for the meshsimplification library
 - '<src/>' : source files for the meshsimplification library
 - '<main/>' : source files for the applications
 - '<test/>' : source files for the tests
