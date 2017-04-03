@@ -1,4 +1,4 @@
-An iterative edge collapse-based mesh  simplification procedure for 
+An iterative simplification procedure for 
 surface grids with data distributed over the surface
 =====================================================================
 
