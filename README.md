@@ -1,6 +1,5 @@
-A C++ library implementing an iterative edge collapse-based mesh 
-simplification procedure for three-dimensional surface grids with 
-distributed data.
+An iterative edge collapse-based mesh  simplification procedure for 
+surface grids with data distributed over the surface
 =====================================================================
 
 For a detailed description of the method, please refer to:
@@ -24,7 +23,9 @@ and the tests, comes with the following folders:
 	
 To compile the library meshsimplification.so and compile and link the
 applications using the GNU C++ compiler, from the project root folder type:
+
 	make [DEBUG=yes] [ENABLE_SELF_INTERSECTIONS=yes] [STATIC=yes] [STATIC_STL=yes]
+	
 Square brackets delimit optional arguments to disable compile-time 
 optimizations and enable debug symbols, disable controls on grid self intersections 
 throughout the procedure, and link against the static version of meshsimplification 
