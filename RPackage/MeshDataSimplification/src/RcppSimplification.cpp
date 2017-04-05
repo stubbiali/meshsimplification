@@ -74,8 +74,8 @@ IntegerMatrix RcppSimplification::getEdges() const
 	IntegerMatrix out(edges.size(),2);
 	for (UInt i = 0; i < edges.size(); ++i)
 	{	
-		out(i,0) = edges[i][0]+1;
-		out(i,1) = edges[i][1]+1;
+		out(i,0) = edges[i][0];
+		out(i,1) = edges[i][1];
 	}
 	
 	return out;
@@ -92,9 +92,9 @@ IntegerMatrix RcppSimplification::getElems() const
 	for (UInt i = 0; i < numElems; ++i)
 	{
 		auto elem(this->simplifier.getCPointerToMesh()->getElem(i));
-		out(i,0) = elem[0]+1;
-		out(i,1) = elem[1]+1;
-		out(i,2) = elem[2]+1;
+		out(i,0) = elem[0];
+		out(i,1) = elem[1];
+		out(i,2) = elem[2];
 	}
 	
 	return out;
@@ -152,14 +152,74 @@ NumericVector RcppSimplification::getQuantityOfInformation() const
 IntegerVector RcppSimplification::getElemsOnEdge(const int & id1, const int & id2) const
 {
 	// Get elements insisting on the edge
-	auto elems(this->simplifier.getCPointerToMeshOperator()->getElemsOnEdge(id1-1,id2-1));
+	auto elems(this->simplifier.getCPointerToMeshOperator()->getElemsOnEdge(id1,id2));
 		
 	return wrap(elems);
 }
 
-List RcppSimplification::getMeshQuadraticFEM() const
+
+List RcppSimplification::getQuadraticFEMesh() const
 {
-	// TODO
+	// Allocate memory for new lists of nodes and triangles
+	auto numVerts(simplifier.getCPointerToMesh()->getNumNodes());
+	auto numElems(simplifier.getCPointerToMesh()->getNumElems());
+	auto numEdges(simplifier.getCPointerToConnectivity()->getNumEdges());
+	NumericMatrix newnodes(numVerts+numEdges,3);
+	IntegerMatrix newelems(numElems,6);
+	
+	// Insert vertices in the list of nodes
+	for (UInt i = 0; i < numVerts; ++i)
+	{
+		auto node(simplifier.getCPointerToMesh()->getNode(i));
+		newnodes(i,0) = node[0];
+		newnodes(i,1) = node[1];
+		newnodes(i,2) = node[2];
+	}
+	
+	// Insert vertices in the list of elements
+	for (UInt i = 0; i < numElems; ++i)
+	{
+		auto elem(simplifier.getCPointerToMesh()->getElem(i));
+		newelems(i,0) = elem[0];
+		newelems(i,1) = elem[1];
+		newelems(i,2) = elem[2];
+	}
+	
+	// Go through all edges
+	auto edges(simplifier.getCPointerToConnectivity()->getEdges());
+	for (UInt i = 0; i < numEdges; ++i)
+	{
+		// Shortcuts
+		UInt id1(edges[i][0]), id2(edges[i][1]);
+		UInt row(numVerts+i-1);
+		
+		// Add mid-point to the list of nodes
+		auto P(simplifier.getCPointerToMesh()->getNode(id1));
+		auto Q(simplifier.getCPointerToMesh()->getNode(id2));
+		newnodes(row,0) = 0.5*(P[0]+Q[0]);
+		newnodes(row,1) = 0.5*(P[1]+Q[1]);
+		newnodes(row,2) = 0.5*(P[2]+Q[2]);
+		
+		// Extract triangles sharing the edge
+		auto trs(simplifier.getCPointerToMeshOperator()->getElemsOnEdge(id1,id2));
+		
+		// Associated the new node to each triangle
+		// Vertices and nodes are ordered as described at 
+		// https://www.cs.cmu.edu/~quake/triangle.highorder.html
+		for (auto id : trs)
+		{
+			auto tr(simplifier.getCPointerToMesh()->getElem(id));
+			if ((tr[1] == id1 && tr[2] == id2) || (tr[1] == id2 && tr[2] == id1))
+				newelems(id,3) = row;
+			if ((tr[2] == id1 && tr[0] == id2) || (tr[2] == id2 && tr[0] == id1))
+				newelems(id,4) = row;
+			if ((tr[0] == id1 && tr[1] == id2) || (tr[0] == id2 && tr[1] == id1))
+				newelems(id,5) = row;
+		}
+	}
+	
+	return List::create(Named("nodes") = newnodes, 
+		Named("triangles") = newelems);
 }
 
 
@@ -167,7 +227,7 @@ List RcppSimplification::getMeshQuadraticFEM() const
 // Auxiliary functions
 //
 
-List getMeshLinearFEM(const NumericMatrix & nodes, const IntegerMatrix & elems)
+List getLinearFEMesh(const NumericMatrix & nodes, const IntegerMatrix & elems)
 {
 	// Check on dimensions
 	if (elems.ncol() != 6)
@@ -190,10 +250,10 @@ List getMeshLinearFEM(const NumericMatrix & nodes, const IntegerMatrix & elems)
 	UInt row(0);
 	for (auto id : vertices)
 	{
-		newnodes(row,0) = nodes(id-1,0);
-		newnodes(row,1) = nodes(id-1,1);
-		newnodes(row,2) = nodes(id-1,2);
-		old2new[id] = row+1;
+		newnodes(row,0) = nodes(id,0);
+		newnodes(row,1) = nodes(id,1);
+		newnodes(row,2) = nodes(id,2);
+		old2new[id] = row;
 		++row;
 	}
 	

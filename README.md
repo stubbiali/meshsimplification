@@ -81,8 +81,8 @@ R package
 
 This project comes also with the R package `MeshDataSimplification`, wrapping the C++ 
 library `meshsimplification`, thus providing a high-level access to its functionalities.
-To expose the C++ code to R, the `Rcpp` API is used, so make sure you have the `Rcpp`
-package correctly installed.
+To expose the C++ code to R, the `Rcpp` and `RcppEigen` API is used, so make sure you have the 
+`Rcpp` and `RcppEigen` packages correctly installed.
 
 The source code for the package is placed in the folder `RPackage/MeshDataSimplification`
 and its subfolders, namely:

@@ -34,7 +34,7 @@ setup.simplification.from.file <- function(file, wgeom = 1/3, wdisp = 1/3, wequi
 	simplifier <- new(mod_RcppSimplification$RcppSimplification, file, wgeom, wdisp, wequi)
 	
 	# Create a simplification object
-	out <- list(simplifier = simplifier)
+	out <- list(simplifier = simplifier, order = 1)
 	class(out) <- "simplification"
 	
 	return(out)
@@ -43,7 +43,7 @@ setup.simplification.from.file <- function(file, wgeom = 1/3, wdisp = 1/3, wequi
 
 #'	Create a simplification structure from a SURFACE_MESH object
 #' 
-#'	@param	mesh	A SURFACE_MESH object; currently, only first order grids are supported.
+#'	@param	mesh	A SURFACE_MESH object.
 #'	@param	loc 	#data-by-3 vector with data locations; default is NULL, i.e. locations
 #'					are supposed to coincide with grid nodes.
 #'	@param	val		#data-by-1 vector with the observations; default is NULL, i.e. observations
@@ -79,21 +79,34 @@ setup.simplification <- function(mesh, loc = NULL, val = NULL, wgeom = 1/3, wdis
 	if (class(mesh) != "SURFACE_MESH")
 		stop("mesh must be an object of class SURFACE_MESH.")
 		
-	# Check if mesh is first order; second order grids are not supported yet
-	if (mesh$order > 1)
-		stop("Only first order grids currently supported.")
-	
-	# Create an RcppSimplification object
+	# Load module
 	mod_RcppSimplification <- Module("mod_RcppSimplification", PACKAGE = "MeshDataSimplification")
+		
+	# Extract vertices and triangles of the grid
+	nodes <- mesh$nodes
+	triangles <- mesh$triangles
+	
+	# Convert from R 1-based indexing to C++ 0-based indexing
+	triangles <- triangles-1
+		
+	# If the mesh consists of quadratic elements, extract linear elements
+	if (mesh$order == 2)
+	{
+		res <- mod_RcppSimplification$getLinearFEMesh(nodes, triangles)
+		nodes <- res$nodes
+		triangles <- res$triangles
+	}
+		
+	# Create an RcppSimplification object
 	if (is.null(loc))
-		simplifier <- new(mod_RcppSimplification$RcppSimplification, mesh$nodes, mesh$triangles, wgeom, wdisp, wequi)
+		simplifier <- new(mod_RcppSimplification$RcppSimplification, nodes, triangles, wgeom, wdisp, wequi)
 	else if (is.null(val))
-		simplifier <- new(mod_RcppSimplification$RcppSimplification, mesh$nodes, mesh$triangles, loc, wgeom, wdisp, wequi)
+		simplifier <- new(mod_RcppSimplification$RcppSimplification, nodes, triangles, loc, wgeom, wdisp, wequi)
 	else
-		simplifier <- new(mod_RcppSimplification$RcppSimplification, mesh$nodes, mesh$triangles, loc, val, wgeom, wdisp, wequi)
+		simplifier <- new(mod_RcppSimplification$RcppSimplification, nodes, triangles, loc, val, wgeom, wdisp, wequi)
 	
 	# Create a simplification object
-	out <- list(simplifier = simplifier)
+	out <- list(simplifier = simplifier, order = mesh$order)
 	class(out) <- "simplification"
 	
 	return(out)
@@ -138,7 +151,7 @@ run.simplification <- function(x, numNodesMax, file = '')
 	# Get list of data points
 	locations <- get.data.locations(x)
 	
-	return(list(mesh, locations))
+	return(list(mesh = mesh, locations = locations))
 }
 
 
@@ -170,6 +183,7 @@ get.nodes <- function(x)
 get.edges <- function(x)
 {
 	out <- x$simplifier$getEdges()
+	out < out + 1
 	return(out)
 }
 
@@ -186,6 +200,7 @@ get.edges <- function(x)
 get.triangles <- function(x)
 {
 	out <- x$simplifier$getElems()
+	out <- out + 1
 	return(out)
 }
 
@@ -236,23 +251,6 @@ get.quantity.of.information <- function(x)
 }
 
 
-#'	Get triangles sharing a given edge
-#'
-#'	@param	x	An object of class simplification, created through
-#'				\code{setup.simplification} or \code{setup.simplification.from.file}.
-#'	@param	id1	Id of the first end-point of the edge.
-#'	@param	id2	Id of the second end-point of the edge.
-#'	@usage		get.triangles.on.edge(x, id1, id2)
-#'	@return		A vector with the Id's of the desired triangles (if any).
-#'	@export
-
-get.triangles.on.edge <- function(x, id1, id2)
-{
-	out <- x$simplifier$getElemsOnEdge(id1,id2)
-	return(out)
-}
-
-
 #'	Get surface mesh
 #'
 #'	@param	x	An object of class simplification, created through
@@ -263,14 +261,26 @@ get.triangles.on.edge <- function(x, id1, id2)
 
 get.surface.mesh <- function(x)
 {
-	# Extract required information
-	nnodes <- x$simplifier$getNumNodes()
-	nodes <- x$simplifier$getNodes()
-	ntriangles <- x$simplifier$getNumElems()
-	triangles <- x$simplifier$getElems()
+	# Extract nodes and triangles, differentiating between
+	# linear and quadratic Finite Elements
+	if (x$order == 1)
+	{
+		nodes <- x$simplifier$getNodes()
+		triangles <- x$simplifier$getElems()
+	}
+	else if (x$order == 2)
+	{
+		res <- x$simplifier$getQuadraticFEMesh()
+		nodes <- res$nodes
+		triangles <- res$triangles
+	}
 	
-	# Create a mesh
-	out <- list(nnodes = nnodes, nodes = nodes, ntriangle = ntriangles, triangles = triangles, order = 1)
+	# Convert from C++ 0-based indexing to R 1-based indexing
+	triangles <- triangles + 1
+	
+	# Create the mesh
+	out <- list(nnodes = dim(nodes)[1], nodes = nodes, 
+		ntriangles = dim(triangles)[1], triangles = triangles, order = x$order)
 	class(out) <- "SURFACE_MESH"
 	return(out)
 }

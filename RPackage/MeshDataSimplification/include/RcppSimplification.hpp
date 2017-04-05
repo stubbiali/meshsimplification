@@ -126,7 +126,15 @@ class RcppSimplification
 			\out  		IntegerVector with the Id's of the required triangles */
 		IntegerVector getElemsOnEdge(const int & id1, const int & id2) const;
 		
-		List getMeshQuadraticFEM() const;
+		/*!	Build the quadratic Finite Elements mesh correspondent to the
+			linear Finite Elements grid stored by the C++ simplification class.
+			In the new list of elements, vertices and nodes are ordered as described at
+			https://www.cs.cmu.edu/~quake/triangle.highorder.html .
+			
+			\out	A List with:
+					- nodes: #nodes-by-3 NumericMatrix storing the nodes (both vertices and not)
+					- triangles: #elements-by-6 IntegerMatrix storing the triangles */ 
+		List getQuadraticFEMesh() const;
 		
 		//
 		// Run the simplification
@@ -146,7 +154,7 @@ class RcppSimplification
 	\out			list holding for the linear elements mesh:
 					- nodes: #vertices-by-3 NumericMatrix storing the vertices (nodes) 
 					- triangles: #elements-by-3 IntegerMatrix storing the triangles */
-List getMeshLinearFEM(const NumericMatrix & nodes, const IntegerMatrix & elems);
+List getLinearFEMesh(const NumericMatrix & nodes, const IntegerMatrix & elems);
 
 // Include implementations of inlined methods
 #include "inline_RcppSimplification.hpp"
@@ -155,11 +163,6 @@ List getMeshLinearFEM(const NumericMatrix & nodes, const IntegerMatrix & elems);
 RCPP_MODULE(mod_RcppSimplification)
 {
 	using namespace Rcpp;
-	
-	// Expose auxiliary function
-	Rcpp::function("getMeshLinearFEM", &getMeshLinearFEM,
-		"Build a mesh with linear elements from a mesh with quadratic elements.")
-	;
 		
 	class_<RcppSimplification>("RcppSimplification")
 		
@@ -215,6 +218,10 @@ RCPP_MODULE(mod_RcppSimplification)
 		.const_method("getElemsOnEdge", 
 			&RcppSimplification::getElemsOnEdge,
 			"Get the Id's of the triangles insisting on an edge.")
+		.const_method("getQuadraticFEMesh", 
+			&RcppSimplification::getQuadraticFEMesh,
+			"Return a quadratic Finite Elements mesh, built from the "
+			"linear Finite Elements mesh stored by the C++ simplification class.")
 		 
 		// Expose method simplificate
 		.method("simplificate", &RcppSimplification::simplificate, 
@@ -222,6 +229,11 @@ RCPP_MODULE(mod_RcppSimplification)
 			"the final number of nodes and a string with the path to the "
 			"output mesh (.inp file format supported).")
 		;
+		
+	// Expose auxiliary function
+	Rcpp::function("getLinearFEMesh", &getLinearFEMesh,
+		"Build a mesh with linear elements from a mesh with quadratic elements.")
+	;
 }
 
 #endif
