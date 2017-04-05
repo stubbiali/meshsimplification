@@ -1,5 +1,5 @@
-An iterative simplification procedure for 
-surface grids with data distributed over the surface
+An iterative simplification procedure for surface grids 
+with associated data distributed over the surface
 =====================================================================
 
 For a detailed description of the method, please refer to:
