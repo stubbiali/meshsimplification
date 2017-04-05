@@ -54,6 +54,46 @@ namespace geometry
 	}
 	
 	
+	UInt gutility::inTri2d_v(const point2d & p, 
+		const point2d & a, const point2d & b, const point2d & c)
+	{
+		// Compute signed area of the triangle pab, pbc and pac
+		auto pab = gutility::getTriArea2d(p,a,b);
+		auto pbc = gutility::getTriArea2d(p,b,c);
+		auto pca = gutility::getTriArea2d(p,c,a);
+				
+		// If the areas are all positive or all negative:
+		// the point is internal to the triangle
+		if (((pab > TOLL) && (pbc > TOLL) && (pca > TOLL)) ||
+			((pab < -TOLL) && (pbc < -TOLL) && (pca < -TOLL)))
+			return 1;
+			
+		// If two areas are zero: the point coincides with
+		// the vertex shared by the associated edges
+		bool pab_iszero = (-TOLL <= pab) && (pab <= TOLL);
+		bool pbc_iszero = (-TOLL <= pbc) && (pbc <= TOLL);
+		bool pca_iszero = (-TOLL <= pca) && (pca <= TOLL);
+		if (pab_iszero && pbc_iszero) 
+			return 6;
+		if (pbc_iszero && pca_iszero)
+			return 7;
+		if (pca_iszero && pab_iszero)
+			return 5;
+			
+		// If one area is zero and the others are concorde:
+		// the point lays on an edge
+		if (pab_iszero && (((pbc > 0) && (pca > 0)) || ((pbc < 0) && (pca < 0))))
+			return 2;
+		if (pbc_iszero && (((pab > 0) && (pca > 0)) || ((pab < 0) && (pca < 0)))) 
+			return 3;
+		if (pca_iszero && (((pab > 0) && (pbc > 0)) || ((pab < 0) && (pbc < 0))))
+			return 4;
+						
+		// Otherwise, the point does not belong to the triangle
+		return 0;	
+	}
+	
+	
 	IntersectionType gutility::intSegSeg2d(const point2d & q1, 
 		const point2d & r1, const point2d & q2, const point2d & r2)
 	{
@@ -220,6 +260,55 @@ namespace geometry
 		
 		// Check belonging in 2D
 		return gutility::inTri2d(p,a,b,c);
+	}
+	
+	
+	tuple<UInt, Real, point3d> gutility::inTri3d_v(const point3d & P, 
+		const point3d & A, const point3d & B, const point3d & C)
+	{
+		// Compute the normal to the triangle and the RHS 
+		// of the equation of the plane the triangle lies in
+		auto N = ((B - A)^(C - B)).normalize();
+		auto D = N*A;
+		
+		//
+		// Test if the point belongs to the plane of the triangle
+		//
+		
+		auto dist = abs(N*P - D);
+		if (dist > TOLL)
+		{
+			auto M(0.333 * (A+B+C));
+			return make_tuple(0, (P-M).norm2squared(), M);
+		}
+			
+		//
+		// The point belongs to the plane of the triangle
+		//
+		
+		// Extract the maximum coordinate of N
+		UInt z = N.getMaxCoor();
+		UInt x = (z+1) % 3;
+		UInt y = (z+2) % 3;
+		
+		// Project all points onto the "xy"-plane
+		point2d p(P[x],P[y]);
+		point2d a(A[x],A[y]);
+		point2d b(B[x],B[y]);
+		point2d c(C[x],C[y]);
+		
+		// Check belonging in 2D
+		auto in(gutility::inTri2d_v(p,a,b,c));
+		
+		// If needed, compute the distance between the point and 
+		// the barycenter of the triangle
+		if (in == 0)
+		{
+			auto M(0.333 * (A+B+C));
+			return make_tuple(0, (P-M).norm2squared(), M);
+		}
+		return make_tuple(in, 0., point3d());
+			
 	}
 	
 				

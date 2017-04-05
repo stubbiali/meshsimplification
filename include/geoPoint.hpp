@@ -240,6 +240,10 @@ namespace geometry
 			/*! The Euclidean norm of the vector.
 				\return		the norm */
 			Real norm2() const;
+			
+			/*! The squared Euclidean norm of the vector.
+				\return		the norm */
+			Real norm2squared() const;
 
 			/*! Normalize the coordinates vector. 
 				\return		the normalized vector */

@@ -21,13 +21,13 @@ namespace geometry
 	}
 	
 	
-	dataPoint::dataPoint(const array<Real,3> & c, const UInt & ID, const UInt & dat) : 
+	dataPoint::dataPoint(const array<Real,3> & c, const UInt & ID, const Real & dat) : 
 		point(c,ID), datum(dat) 
 	{
 	}
 	
 	
-	dataPoint::dataPoint(const point & p, Real const & dat) : 
+	dataPoint::dataPoint(const point & p, const Real & dat) : 
 		point(p), datum(dat) 
 	{
 	}

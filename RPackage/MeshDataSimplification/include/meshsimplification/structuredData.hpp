@@ -81,6 +81,15 @@ namespace geometry
 				\return		vector of Id's */ 
 			vector<UInt> getNeighbouringElements(const UInt & Id) const;
 			
+			/*!	Given a point, returns the elements which it may
+				belongs to. This method will be useful to construct
+				data-element connections in case of data locations
+				not coinciding with grid nodes.
+				
+				\param P	three-dimensional point
+				\return		vector of Id's */ 
+			vector<UInt> getNeighbouringElements(const point3d & P) const;
+			
 			//
 			// Set methods
 			//

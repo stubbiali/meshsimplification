@@ -39,6 +39,12 @@ namespace geometry
 	{
 	}
 	
+	template<typename SHAPE>
+	mesh<SHAPE, MeshType::GEO>::mesh(const MatrixXd & nds, const MatrixXi & els) :
+		bmesh<SHAPE>(nds, els)
+	{
+	}
+	
 	
 	//
 	// Constructors (MeshType::DATA)
@@ -89,14 +95,74 @@ namespace geometry
 	
 	
 	template<typename SHAPE>
-	mesh<SHAPE, MeshType::DATA>::mesh(const string & filename) :
+	mesh<SHAPE, MeshType::DATA>::mesh(const string & filename, const vector<Real> & val) :
 		bmesh<SHAPE>(filename)
+	{
+		// Check dimensions
+		if ((val.size() > 0) && (val.size() != this->numNodes))
+			throw runtime_error("Number of observations must coincide with number of grid nodes.");
+			
+		// Fill data points list with points coinciding with the nodes
+		data.reserve(this->numNodes);
+		for (UInt i = 0; i < this->numNodes; ++i)
+		{
+			Real datum = (val.size() > 0) ? val[i] : 0.;
+			data.emplace_back(this->nodes[i], datum);
+		}
+	}
+	
+	
+	template<typename SHAPE>
+	mesh<SHAPE, MeshType::DATA>::mesh(const MatrixXd & nds, const MatrixXi & els) :
+		bmesh<SHAPE>(nds, els)
 	{
 		// Fill data points list with points coinciding 
 		// with the nodes and associated to a null datum
-		data.reserve(this->nodes.size());
+		data.reserve(this->numNodes);
 		for (auto node : this->nodes)
 			data.emplace_back(node);
+	}
+	
+	
+	template<typename SHAPE>
+	mesh<SHAPE, MeshType::DATA>::mesh(const MatrixXd & nds, const MatrixXi & els, const VectorXd & val) :
+		bmesh<SHAPE>(nds, els)
+	{
+		// Check on dimensions
+		if (val.size() != this->numNodes)
+			throw runtime_error("The data locations are supposed to coincide with the grid nodes, "
+				"hence the number of rows for the third argument must match the number of rows of "
+				"the first argument.");
+				
+		// Fill data points list
+		data.reserve(this->numNodes);
+		for (UInt i = 0; i < this->numNodes; ++i)
+			data.emplace_back(this->nodes[i], val(i));
+	}
+	
+	
+	template<typename SHAPE>
+	mesh<SHAPE, MeshType::DATA>::mesh(const MatrixXd & nds, const MatrixXi & els, 
+		const MatrixXd & loc, const VectorXd & val) :
+		bmesh<SHAPE>(nds, els)
+	{
+		// Checks on dimensions
+		if ((val.size() > 0) && (loc.rows() != val.size()))
+			throw runtime_error("Number of data locations and values must coincide.");
+		if (loc.cols() != 3)
+			throw runtime_error("Data locations must be specified as three dimensional points.");
+			
+		// Fill data points list
+		data.reserve(loc.rows());
+		array<Real,3> pos;
+		for (UInt i = 0; i < loc.rows(); ++i)
+		{
+			pos[0] = loc(i,0);
+			pos[1] = loc(i,1);
+			pos[2] = loc(i,2);
+			Real datum = (val.size() > 0) ? val(i) : 0.;
+			data.emplace_back(pos, i, datum);
+		}
 	}
 	
 	

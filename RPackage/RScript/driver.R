@@ -7,8 +7,8 @@
 #' @param wdisp	weight for displacement cost function
 #' @param wequi	weight for equidistribution cost function
 
-iFile <- '../mesh/pawn.inp'
-oFile <- '../mesh/pawn_R.inp'
+iFile <- '../../mesh/pawn.inp'
+oFile <- '../../mesh/pawn.inp'
 n <- 2000
 wgeom <- 1/3
 wdisp <- 1/3
@@ -18,16 +18,25 @@ wequi <- 1/3
 
 require(Rcpp)
 require(MeshDataSimplification)
-#module <- Module("mod_MeshDataSimplification", PACKAGE = "MeshDataSimplification")
+module <- Module("mod_RcppSimplification", PACKAGE = "MeshDataSimplification")
 #obj <- new(module$RcppSimplification, iFile, wgeom, wdisp, wequi)
 #obj$simplificate(n, oFile)
-obj <- initialize.simplification(iFile, wgeom, wdisp, wequi)
-run.simplification(obj, n, oFile)
+obj <- setup.simplification.from.file(iFile)
+#out <- run.simplification(obj, n)
+#out
+
 nodes <- get.nodes(obj)
-nodes
-elems <- get.elems(obj)
-elems
-data <- get.data(obj)
-data
-qoi <- get.quantity.of.information(obj)
-qoi
+triangles <- get.triangles(obj)
+triangles <- cbind(triangles, triangles)
+#loc <- get.data.locations(obj)
+#val <- get.observations(obj)
+
+mesh <- list(nodes=nodes, triangles=triangles, order=1)
+class(mesh) <- "SURFACE_MESH"
+
+#obj2 <- setup.simplification(mesh)
+#out <- run.simplification(obj, n)
+#out
+
+out <- module$getMeshLinearFEM(nodes, triangles)
+out

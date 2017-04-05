@@ -56,6 +56,13 @@ namespace geometry
 				\param filename	name of the file storing the mesh */
 			mesh(const string & filename);
 			
+			/*!	Constructor specifically designed for the R interface. 
+				\param nds	#nodes-by-dim Eigen matrix storing the coordinates
+							of the nodes
+				\param els	#elements-by-NV Eigen matrix storing for each element
+							the Id's of its vertices */
+			mesh(const MatrixXd & nds, const MatrixXi & els);
+			
 			/*! Constructor. 
 				\param bm	another (base) grid */
 			mesh(const bmesh<SHAPE> & bm);
@@ -97,8 +104,47 @@ namespace geometry
 				const vector<dataPoint> & dat = vector<dataPoint>());
 					
 			/*! Constructor.
-				\param filename	name of input file */
-			mesh(const string & filename);
+				Note that the data locations are supposed to coincide with the 
+				grid nodes.
+				 
+				\param filename	name of input file 
+				\param val 		data values*/
+			mesh(const string & filename, const vector<Real> & val = {});
+			
+			/*!	Constructor specifically designed for the R interface. 
+				The data locations are supposed to coincide with the grid nodes
+				and the observations are set to zero.
+				
+				\param nds	#nodes-by-dim Eigen matrix storing the coordinates
+							of the nodes
+				\param els	#elements-by-NV Eigen matrix storing for each element
+							the Id's of its vertices */
+			mesh(const MatrixXd & nds, const MatrixXi & els);
+			
+			/*!	Constructor specifically designed for the R interface.
+				The data locations are supposed to coincide with the grid nodes
+				while the observations are specified by the user.
+				
+				\param nds	#nodes-by-dim Eigen matrix storing the coordinates
+							of the nodes
+				\param els	#elements-by-NV Eigen matrix storing for each element
+							the Id's of its vertices 
+				\param val	#nodes-by-1 Eigen array with data observations */
+			mesh(const MatrixXd & nds, const MatrixXi & els, const VectorXd & val);
+			
+			/*!	Constructor specifically designed for the R interface.
+				Both the data locations and values are specified by the user.
+				Note that this constructor is provided only for triangular grids.
+				
+				\param nds	#nodes-by-3 Eigen matrix storing the coordinates
+							of the nodes
+				\param els	#elements-by-3 Eigen matrix storing for each element
+							the Id's of its vertices 
+				\param loc	#data-by-3 Eigen matrix storing the coordinates of
+							data locations
+				\param val	#data-by-1 Eigen array with data observations */
+			mesh(const MatrixXd & nds, const MatrixXi & els, const MatrixXd & loc,
+				const VectorXd & val = VectorXd());
 			
 			/*! Constructor. 
 				\param bm	a bmesh object */

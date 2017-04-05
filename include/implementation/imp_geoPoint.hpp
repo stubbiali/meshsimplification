@@ -418,6 +418,13 @@ namespace geometry
 	
 	
 	template<UInt N>
+	INLINE Real geoPoint<N>::norm2squared() const
+	{
+		return inner_product(coor.cbegin(), coor.cend(), coor.cbegin(), 0.);
+	}
+	
+	
+	template<UInt N>
 	geoPoint<N> & geoPoint<N>::normalize()
 	{
 		auto len = norm2();

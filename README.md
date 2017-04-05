@@ -104,7 +104,7 @@ through
 
 	make install
 	
-from the project root folder. Then, move to the `RPackage/MeshDataSimplification` folder and type:
+from the project root folder. Then, move to the `RPackage/MeshDataSimplification` folder and type
 
 	sudo R -e "library(devtools); install()" --silent
 	

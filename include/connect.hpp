@@ -63,13 +63,17 @@ namespace geometry
 			/*! Constructor.
 				\param bg	a (base) grid */
 			connect(const bmesh<SHAPE> & bg);
+			
+			/*!	Constructor.
+				\param file	path to input mesh */
+			connect(const string & file);
 									
-			/*! Constructor.
-				\param args	arguments to forward to mesh 
-				
-				\sa mesh.hpp */
-			template<typename... Args>
-			connect(Args... args);
+			/*!	Constructor specifically designed for the R interface.
+				\param nds	#nodes-by-dim Eigen matrix storing the coordinates
+							of the nodes
+				\param els	#elements-by-NV Eigen matrix storing for each element
+							the Id's of its vertices */
+			connect(const MatrixXd & nds, const MatrixXi & els);
 	};
 	
 	/*! Partial specialization for grids with distributed data. */
@@ -105,13 +109,49 @@ namespace geometry
 				
 				\sa bmesh.hpp */
 			connect(const bmesh<SHAPE> & bg);
-									
-			/*! Constructor.
-				\param args	arguments to forward to mesh 
+			
+			/*!	Constructor.
+				Note that when the mesh is passed via file, the data locations
+				are supposed to coincide with the grid nodes.
 				
-				\sa mesh.hpp */
-			template<typename... Args>
-			connect(Args... args);
+				\param file	path to input mesh 
+				\param val	observations*/
+			connect(const string & file, const vector<Real> & val = {});
+									
+			/*!	Constructor specifically designed for the R interface. 
+				The data locations are supposed to coincide with the grid nodes
+				and the observations are set to zero.
+				
+				\param nds	#nodes-by-dim Eigen matrix storing the coordinates
+							of the nodes
+				\param els	#elements-by-NV Eigen matrix storing for each element
+							the Id's of its vertices */
+			connect(const MatrixXd & nds, const MatrixXi & els);
+			
+			/*!	Constructor specifically designed for the R interface.
+				The data locations are supposed to coincide with the grid nodes
+				while the observations are specified by the user.
+				
+				\param nds	#nodes-by-dim Eigen matrix storing the coordinates
+							of the nodes
+				\param els	#elements-by-NV Eigen matrix storing for each element
+							the Id's of its vertices 
+				\param val	#nodes-by-1 Eigen array with data observations */
+			connect(const MatrixXd & nds, const MatrixXi & els, const VectorXd & val);
+			
+			/*!	Constructor specifically designed for the R interface.
+				Both the data locations and values are specified by the user.
+				Note that this constructor is provided only for triangular grids.
+				
+				\param nds	#nodes-by-3 Eigen matrix storing the coordinates
+							of the nodes
+				\param els	#elements-by-3 Eigen matrix storing for each element
+							the Id's of its vertices 
+				\param loc	#data-by-3 Eigen matrix storing the coordinates of
+							data locations
+				\param val	#data-by-1 Eigen array with data observations */
+			connect(const MatrixXd & nds, const MatrixXi & els, const MatrixXd & loc,
+				const VectorXd & val = VectorXd());
 			
 			//
 			// Initialize and clear connections
@@ -120,14 +160,22 @@ namespace geometry
 			/*! Initialize data-element connections. 
 				This method supposes the data points coincide with the nodes, 
 				then data-element connections coincide with node-element connections.
-				In case data points and nodes do not coincide, the user may manually
-				set data-element connections through setData2Elem(). 
-				
-				\sa setData2Elem() */
+				In case data points and nodes do not coincide, see buildData2Elem_p(). */
 			void buildData2Elem();
+			
+			/*!	Initialize data-element connections by finding, for each
+				data point, the triangle(s) it belongs too. This pedantic (this is why
+				the "_p" in the name) is surely more expensive than buildData2Elem(),
+				however it allows to deal with data non located at the grid nodes. 
+				Note that this method is provided only for triangular grids. */
+			void buildData2Elem_p();
 			
 			/*! Initialize element-data connections. */
 			void buildElem2Data();
+			
+			/*! Initialize element-data connections. This version should be 
+				prefered whenever data locations do not coincide with grid nodes. */
+			void buildElem2Data_p();
 					
 			/*! Re-build all connections. */
 			virtual void refresh();

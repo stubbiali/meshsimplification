@@ -61,6 +61,13 @@ namespace geometry
 				\param filename	name of the file storing the mesh */
 			bmesh(const string & filename);
 			
+			/*!	Constructor specifically designed for the R interface.
+				\param nds	#nodes-by-dim Eigen matrix storing the coordinates
+							of the nodes
+				\param els	#elements-by-NV Eigen matrix storing for each element
+							the Id's of its vertices */
+			bmesh(const MatrixXd & nds, const MatrixXi & els);
+			
 			/*! Synthetic copy constructor. 
 				\param bm	another mesh */
 			bmesh(const bmesh & bm) = default;

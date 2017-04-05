@@ -141,6 +141,56 @@ namespace geometry
 	}
 	
 	
+	template<typename SHAPE>
+	vector<UInt> structuredData<SHAPE>::getNeighbouringElements(const point3d & P) const
+	{
+		// Implementation provide only for triangular and quadrilateral grids
+		static_assert(((SHAPE::numVertices == 3) || (SHAPE::numVertices == 4)),
+			"getIntersectingBoundingBoxes(), then the entire class, "
+			"provided only for triangular and quadrilateral grids.");
+			
+		// Compute indices for the point within the structure		
+		searchPoint sp_P(P);
+						
+		//
+		// Find triangles the point may belong to
+		//
+		// We return all the triangles associated with the cell P
+		// falls within, plus an extra layer. This should ensure 
+		// that all elements which P may belong to are taken into 
+		// account since an element cannot span more than one cell.
+					
+		unordered_set<UInt> res;
+		
+		// Determine indices range
+		UInt i_start = (sp_P[0] == 0) ? 0 : sp_P[0]-1;
+		UInt i_stop = sp_P[0]+1;
+		UInt j_start = (sp_P[1] == 0) ? 0 : sp_P[1]-1;
+		UInt j_stop = sp_P[1]+1;
+		UInt k_start = (sp_P[2] == 0) ? 0 : sp_P[2]-1;
+		UInt k_stop = sp_P[2]+1;
+						
+		for (UInt i = i_start; i <= i_stop; ++i)
+			for (UInt j = j_start; j <= j_stop; ++j)
+				for (UInt k = k_start; k <= k_stop; ++k)
+				{
+					// Compute scalar index
+					UInt idx(i + j * bbox3d::getNumCells(0) + 
+						k * bbox3d::getNumCells(0) * bbox3d::getNumCells(1));
+												
+					// Extract all boxes having that index
+					auto range = boxes.equal_range(idx);
+					
+					// Extract boxes Id's						
+					for (auto it = range.first; it != range.second; ++it)
+						if (grid->isElemActive(it->getId()))
+							res.insert(it->getId());
+				}
+		
+		return {res.cbegin(), res.cend()};
+	}
+	
+	
 	//
 	// Set methods
 	//

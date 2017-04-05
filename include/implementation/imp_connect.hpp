@@ -18,9 +18,15 @@ namespace geometry
 	
 	
 	template<typename SHAPE>
-	template<typename... Args>
-	connect<SHAPE, MeshType::GEO>::connect(Args... args) :
-		bconnect<SHAPE, MeshType::GEO>(args...)
+	connect<SHAPE, MeshType::GEO>::connect(const string & file) :
+		bconnect<SHAPE, MeshType::GEO>(file)
+	{
+	}
+	
+	
+	template<typename SHAPE>
+	connect<SHAPE, MeshType::GEO>::connect(const MatrixXd & nds, const MatrixXi & els) :
+		bconnect<SHAPE, MeshType::GEO>(nds, els)
 	{
 	}
 	
@@ -40,14 +46,51 @@ namespace geometry
 	
 	
 	template<typename SHAPE>
-	template<typename... Args>
-	connect<SHAPE, MeshType::DATA>::connect(Args... args) :
-		bconnect<SHAPE, MeshType::DATA>(args...)
+	connect<SHAPE, MeshType::DATA>::connect(const string & file, const vector<Real> & val) :
+		bconnect<SHAPE, MeshType::DATA>(file, val)
 	{
 		// Build data-element and element-data connections
 		buildData2Elem();
 		buildElem2Data();
 	}
+	
+	
+	template<typename SHAPE>
+	connect<SHAPE, MeshType::DATA>::connect(const MatrixXd & nds, const MatrixXi & els) :
+		bconnect<SHAPE, MeshType::DATA>(nds, els)
+	{
+		// Build data-element and element-data connections
+		buildData2Elem();
+		buildElem2Data();
+	}
+	
+	
+	template<typename SHAPE>
+	connect<SHAPE, MeshType::DATA>::connect(const MatrixXd & nds, const MatrixXi & els,
+		const VectorXd & val) :
+		bconnect<SHAPE, MeshType::DATA>(nds, els, val)
+	{
+		// Build data-element and element-data connections
+		buildData2Elem();
+		buildElem2Data();
+	}
+	
+	
+	template<typename SHAPE>
+	connect<SHAPE, MeshType::DATA>::connect(const MatrixXd & nds, const MatrixXi & els, 
+		const MatrixXd & loc, const VectorXd & val) :
+		bconnect<SHAPE, MeshType::DATA>(nds, els, loc, val)
+	{
+		// This constructor is provided only for triangular grids
+		static_assert(is_same<SHAPE,Triangle>::value, 
+			"This constructor is provided only for triangular grids.");
+	}
+	
+	
+	// Specialization for triangular grids
+	template<>
+	connect<Triangle, MeshType::DATA>::connect(const MatrixXd & nds, const MatrixXi & els, 
+		const MatrixXd & loc, const VectorXd & val);
 	
 	
 	//
@@ -68,6 +111,20 @@ namespace geometry
 		// Copy node-element connections into data-element connections
 		copy(this->node2elem.begin(), this->node2elem.end(), back_inserter(data2elem));
 	}
+		
+	
+	template<typename SHAPE>
+	void connect<SHAPE, MeshType::DATA>::buildData2Elem_p()
+	{
+		// This method is provided only for triangular grids
+		static_assert(is_same<SHAPE,Triangle>::value,
+			"This method is provided only for triangular grids.");
+	}
+	
+	
+	// Specialization for triangular grids
+	template<>
+	void connect<Triangle, MeshType::DATA>::buildData2Elem_p();
 	
 	
 	template<typename SHAPE>
@@ -84,10 +141,38 @@ namespace geometry
 		// Set elements Id's
 		for (UInt id = 0; id < this->grid.getNumElems(); ++id)
 			elem2data.emplace_back(id);
-			
+						
 		// Loop over all elements
 		for (UInt datumId = 0; datumId < this->grid.getNumData(); ++datumId)
-		{
+		{			
+			// Extract elements connected to the datum
+			auto conn = data2elem[datumId].getConnected();
+			
+			// Add the datum to the elements
+			for (auto elemId : conn)
+				elem2data[elemId].insert(datumId);
+		}
+	}
+	
+	
+	template<typename SHAPE>
+	void connect<SHAPE, MeshType::DATA>::buildElem2Data_p()
+	{
+		// First, build data-element connections
+		if (data2elem.empty())
+			buildData2Elem_p();
+			
+		// Reserve memory
+		elem2data.clear();
+		elem2data.reserve(this->grid.getNumElems());
+		
+		// Set elements Id's
+		for (UInt id = 0; id < this->grid.getNumElems(); ++id)
+			elem2data.emplace_back(id);
+						
+		// Loop over all elements
+		for (UInt datumId = 0; datumId < this->grid.getNumData(); ++datumId)
+		{			
 			// Extract elements connected to the datum
 			auto conn = data2elem[datumId].getConnected();
 			

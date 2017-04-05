@@ -26,7 +26,7 @@ Maintainer: Stefano Ubbiali <stefano.ubbiali@mail.polimi.it>
 Depends: 
 	R (>= 3.0.0)
 LinkingTo: 
-	Rcpp (>= 0.9.11)
+	Rcpp (>= 0.9.11), RcppEigen
 Description: An iterative edge collapse-based simplification strategy for 
 	triangular surface grids with distributed data. For the selection of the
 	edge to contract at each iteration, an edge cost function is introduced,

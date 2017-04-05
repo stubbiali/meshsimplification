@@ -4,6 +4,8 @@
 #ifndef HH_INC_HH
 #define HH_INC_HH
 
+#include "Eigen/Dense"
+
 namespace geometry
 {
 	//
@@ -42,6 +44,7 @@ namespace geometry
 	//
 	
 	using namespace std;
+	using namespace Eigen;
 }
 
 #endif

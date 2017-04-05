@@ -27,12 +27,12 @@ namespace geometry
 				\param c	array with coordinates 
 				\param ID	point Id
 				\param dat	datum */
-			dataPoint(const array<Real,3> & c, const UInt & ID = 0, const UInt & dat = 0.);
+			dataPoint(const array<Real,3> & c, const UInt & ID = 0, const Real & dat = 0.);
 			
 			/*! Constructor.
 				\param p	point
 				\param dat	datum */
-			dataPoint(const point & p, Real const & dat = 0.);
+			dataPoint(const point & p, const Real & dat = 0.);
 			
 			/*! Synthetic copy constructor.
 				\param p	another point */

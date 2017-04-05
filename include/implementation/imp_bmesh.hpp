@@ -60,6 +60,32 @@ namespace geometry
 	}
 	
 	
+	template<typename SHAPE>
+	bmesh<SHAPE>::bmesh(const MatrixXd & nds, const MatrixXi & els) :
+		numNodes(nds.rows()), numElems(els.rows())
+	{
+		// Check dimensions
+		if ((nds.cols() != 3) || (els.cols() != NV))
+			throw runtime_error("Dimensions check failed; first input matrix should have "
+				"3 columns, while the second input matrix " + to_string(NV) + " columns.");
+				
+		// Initialize nodes list
+		nodes.reserve(numNodes);
+		for (UInt i = 0; i < numNodes; ++i)
+			nodes.emplace_back(nds(i,0), nds(i,1), nds(i,2), i);
+			
+		// Initialize elements list
+		elems.reserve(numElems);
+		array<UInt,NV> ids;
+		for (UInt i = 0; i < numElems; ++i)
+		{
+			for (UInt j = 0; j < NV; ++j)
+				ids[j] = UInt(els(i,j));
+			elems.emplace_back(ids, i);
+		}
+	}
+		
+	
 	//
 	// Operators
 	//

@@ -99,16 +99,102 @@ namespace geometry
 			//
 			// Constructors
 			//
-			  
+						  
 			/*!	Constructor.
 				\param file	path to the file storing the mesh
-				\param args	extra parameters possibly required by CostClass: 
-							- OnlyGeo<MT>: nothing
-							- DataGeo: 	weights for the geometric, data displacement
-										and data distributions costs */
-			template<typename... Args>
-			simplification(const string & file, Args... args);
+								
+				\sa bcost, OnlyGeo, DataGeo */
+			simplification(const string & file);
 			
+			/*!	Constructor, provided only for grids with associated data.
+				\param file	path to the file storing the mesh
+				\param wgeo	weight for geometric cost function
+				\param wdis	weight for data displacement cost function
+				\param wequ	weight for data equidistribution cost function	
+							
+				\sa bcost, DataGeo */
+			simplification(const string & file, const Real & wgeo,
+				const Real & wdis, const Real & wequ);
+			
+			/*!	Constructor, provided only for grids with dassociated data.
+				\param file	path to the file storing the mesh
+				\param val	data observations
+				\param wgeo	weight for geometric cost function
+				\param wdis	weight for data displacement cost function
+				\param wequ	weight for data equidistribution cost function
+								
+				\sa bcost, DataGeo */
+			simplification(const string & file, const vector<Real> & val, 
+				const Real & wgeo = 1./3, const Real & wdis = 1./3, const Real & wequ = 1./3);
+									
+			/*!	Constructor specifically designed for the R interface. 
+				In case of grids with distributed data, the data locations are supposed 
+				to coincide with the grid nodes and the observations are set to zero.
+				
+				\param nds	#nodes-by-3 Eigen matrix storing the coordinates
+							of the nodes
+				\param els	#elements-by-3 Eigen matrix storing for each element
+							the Id's of its vertices 
+												
+				\sa bcost, OnlyGeo, DataGeo */
+			simplification(const MatrixXd & nds, const MatrixXi & els);
+			
+			/*!	Constructor specifically designed for the R interface and 
+				provided only for grids with associated data. 
+				The data locations are supposed to coincide with the grid 
+				nodes and the observations are set to zero.
+				
+				\param nds	#nodes-by-3 Eigen matrix storing the coordinates
+							of the nodes
+				\param els	#elements-by-3 Eigen matrix storing for each element
+							the Id's of its vertices 
+				\param wgeo	weight for geometric cost function
+				\param wdis	weight for data displacement cost function
+				\param wequ	weight for data equidistribution cost function
+												
+				\sa bcost, DataGeo */
+			simplification(const MatrixXd & nds, const MatrixXi & els,
+				const Real & wgeo, const Real & wdis, const Real & wequ);
+						
+			/*!	Constructor specifically designed for the R interface and
+				provided only for grids with associated data.
+				The data locations are specified by the user, while the 
+				observations are all set to zero.
+								
+				\param nds	#nodes-by-3 Eigen matrix storing the coordinates
+							of the nodes
+				\param els	#elements-by-3 Eigen matrix storing for each element
+							the Id's of its vertices 
+				\param loc	#data-by-3 Eigen matrix storing the coordinates of
+							data locations
+				\param wgeo	weight for geometric cost function
+				\param wdis	weight for data displacement cost function
+				\param wequ	weight for data equidistribution cost function
+								
+				\sa bcost, DataGeo */
+			simplification(const MatrixXd & nds, const MatrixXi & els, const MatrixXd & loc,
+				const Real & wgeo = 1./3, const Real & wdis = 1./3, const Real & wequ = 1./3);
+				
+			/*!	Constructor specifically designed for the R interface and
+				provided only for grids with associated data.
+				Both data locations and values are specified by the user.
+								
+				\param nds	#nodes-by-3 Eigen matrix storing the coordinates
+							of the nodes
+				\param els	#elements-by-3 Eigen matrix storing for each element
+							the Id's of its vertices 
+				\param loc	#data-by-3 Eigen matrix storing the coordinates of
+							data locations
+				\param val	#data-by-1 Eigen array with data observations 
+				\param wgeo	weight for geometric cost function
+				\param wdis	weight for data displacement cost function
+				\param wequ	weight for data equidistribution cost function 
+								
+				\sa bcost, DataGeo */
+			simplification(const MatrixXd & nds, const MatrixXi & els, 
+				const MatrixXd & loc, const VectorXd & val, 
+				const Real & wgeo = 1./3, const Real & wdis = 1./3, const Real & wequ = 1./3);			
+						
 			//
 			// Initialization and refreshing methods
 			//
@@ -261,19 +347,12 @@ namespace geometry
 				\param file				path to output file; if empty, nothing is printed */
 			void simplificate(const UInt & numNodesMax, const bool & enableDontTouch,
 				const string & file = "");
-								
-			/*! Method which iteratively contracts the first K "non-interacting"
-				edges with minimum cost until reaching a maximum amount of nodes.
-				The parameter K is defined by the user
-				Once the procedure is done, the mesh is possibly print to file.
-				
-				\param numNodesMax		maximum number of nodes
-				\param K				number of edges to simplificate per iteration
-				\param enableDontTouch	TRUE if one element must be fixed,
-										FALSE otherwise
-				\param file				path to output file; if empty, nothing is printed */
-			void simplificate_greedy(const UInt & numNodesMax, const UInt & k,
-				const bool & enableDontTouch, const string & file = "");
+												
+		private:
+			/*!	Initialize the class, i.e. build collapsingSet and find the element
+				possibly to preserve throughout the simplification process. 
+				This method is just call in the constructor. */
+			void initialize();
 	};
 }
 

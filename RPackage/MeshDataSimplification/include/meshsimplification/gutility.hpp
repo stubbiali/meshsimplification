@@ -60,6 +60,26 @@ namespace geometry
 				\return		relative position of the point w.r.t. the triangle */
 			static Point2Tri inTri2d(const point2d & p, const point2d & a,
 				const point2d & b, const point2d & c);
+				
+			/*!	Test if a two-dimensional point lays within a triangle.
+				This is the verbose version of the method inTri2d (this is why
+				"_v" in the method name). Indeed, the method returns:
+					- 0, if the point is outside the triangle;
+					- 1, if the point is strictly inside the triangle;
+					- 2, if the point lays onto the edge ab;
+					- 3, if the point lays onto the edge bc;
+					- 4, if the point lays onto the edge ca;
+					- 5, if the point coincides with a;
+					- 6, if the point coincides with b;
+					- 7, if the point coincides with c.
+					
+				\param p	the point
+				\param a	first vertex of the triangle
+				\param b	second vertex of the triangle
+				\param c	thrid vertex of the triangle
+				\return		relative position of the point w.r.t. the triangle */
+			static UInt inTri2d_v(const point2d & p, const point2d & a,
+				const point2d & b, const point2d & c);
 			
 			/*!	Test if two segments in the plane intersect one each other. 
 				\param q1	querying end-point of first segment
@@ -74,13 +94,39 @@ namespace geometry
 			// Three-dimensional methods
 			//
 			
-			/*!	Test of a point lays within a three-dimensional triangle.
+			/*!	Test if a point lays within a three-dimensional triangle.
 				\param P	the point
 				\param A	first vertex of the triangle
 				\param B	second vertex of the triangle
 				\param C	thrid vertex of the triangle
 				\return		relative position of the point w.r.t. the triangle */
 			static Point2Tri inTri3d(const point3d & P, const point3d & A,
+				const point3d & B, const point3d & C);
+				
+			/*!	Test if a point lays within a three-dimensional triangle.
+				This is the verbose version of the method inTri3d (this is why
+				"_v" in the method name). Indeed, the method returns:
+					- 0, if the point is outside the triangle;
+					- 1, if the point is strictly inside the triangle;
+					- 2, if the point lays onto the edge AB;
+					- 3, if the point lays onto the edge BC;
+					- 4, if the point lays onto the edge CA;
+					- 5, if the point coincides with A;
+					- 6, if the point coincides with B;
+					- 7, if the point coincides with C.
+				If the point falls out the triangle, the distance between 
+				the point and the barycenter of the triangle is returned too,
+				as well as the barycenter itself.
+					
+				\param P	the point
+				\param A	first vertex of the triangle
+				\param B	second vertex of the triangle
+				\param C	thrid vertex of the triangle
+				\return		relative position of the point w.r.t. the triangle 
+				\return  	if the point falls outside the triangle, distance
+							between the point and the barycenter of the triangle itself 
+				\return 	barycenter of the triangle */
+			static tuple<UInt, Real, point3d> inTri3d_v(const point3d & P, const point3d & A,
 				const point3d & B, const point3d & C);
 				
 			/*!	Test if a segment intersect a plane.

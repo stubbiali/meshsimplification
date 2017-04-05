@@ -16,41 +16,85 @@ namespace geometry
 	//
 	
 	template<MeshType MT, typename CostClass>
-	template<typename... Args>
 	simplification<Triangle, MT, CostClass>::simplification
-		(const string & file, Args... args) :
-		gridOperation(file), costObj(&gridOperation, args...), 
+		(const string & file) :
+		gridOperation(file), costObj(&gridOperation), 
 		structData(gridOperation), intrs(gridOperation.getPointerToMesh()), 
 		dontTouch(true), dontTouchId(0)
 	{
-		#ifdef NDEBUG
-			using namespace std::chrono;
-			high_resolution_clock::time_point start, stop;
-		#endif
-		
-		// Important control on coherence between the inputs:
-		// error if the CostClass supports distributed data but the
-		// mesh is purely geometrical
-		static_assert(std::is_base_of<bcost<Triangle, MT, CostClass>, CostClass>::value,
-			"CostClass must be coherent with the mesh type.");
-
-		// Create the set of collapsingEdge's ordered by cost
-		#ifndef NDEBUG
-			cout << "Initialize list of edges ordered by the associated collapsing cost ... ";
-			setupCollapsingSet();
-			cout << "done" << endl;
-		#else
-			start = high_resolution_clock::now();
-			setupCollapsingSet();
-			stop = high_resolution_clock::now();
-			auto dif_collapsingSet = duration_cast<milliseconds>(stop-start).count();
-			cout << "Initialization completed in " << dif_collapsingSet/1000 << " seconds." << endl;
-		#endif
-
-		// Define the fixed element
-		findDontTouchId();
+		initialize();
 	}
 	
+	
+	template<MeshType MT, typename CostClass>
+	simplification<Triangle, MT, CostClass>::simplification
+		(const string & file, const Real & wgeo, const Real & wdis, const Real & wequ) :
+		gridOperation(file), costObj(&gridOperation, wgeo, wdis, wequ), 
+		structData(gridOperation), intrs(gridOperation.getPointerToMesh()), 
+		dontTouch(true), dontTouchId(0)
+	{
+		initialize();
+	}
+	
+	
+	template<MeshType MT, typename CostClass>
+	simplification<Triangle, MT, CostClass>::simplification
+		(const string & file, const vector<Real> & val, 
+		const Real & wgeo, const Real & wdis, const Real & wequ) :
+		gridOperation(file, val), costObj(&gridOperation, wgeo, wdis, wequ), 
+		structData(gridOperation), intrs(gridOperation.getPointerToMesh()), 
+		dontTouch(true), dontTouchId(0)
+	{
+		initialize();
+	}
+	
+	
+	template<MeshType MT, typename CostClass>
+	simplification<Triangle, MT, CostClass>::simplification
+		(const MatrixXd & nds, const MatrixXi & els) :
+		gridOperation(nds, els), costObj(&gridOperation), 
+		structData(gridOperation), intrs(gridOperation.getPointerToMesh()), 
+		dontTouch(true), dontTouchId(0)
+	{
+		initialize();
+	}
+	
+	
+	template<MeshType MT, typename CostClass>
+	simplification<Triangle, MT, CostClass>::simplification
+		(const MatrixXd & nds, const MatrixXi & els,
+		const Real & wgeo, const Real & wdis, const Real & wequ) :
+		gridOperation(nds, els), costObj(&gridOperation, wgeo, wdis, wequ), 
+		structData(gridOperation), intrs(gridOperation.getPointerToMesh()), 
+		dontTouch(true), dontTouchId(0)
+	{
+		initialize();
+	}
+		
+	
+	template<MeshType MT, typename CostClass>
+	simplification<Triangle, MT, CostClass>::simplification
+		(const MatrixXd & nds, const MatrixXi & els, const MatrixXd & loc,
+		const Real & wgeo, const Real & wdis, const Real & wequ) :
+		gridOperation(nds, els, loc), costObj(&gridOperation, wgeo, wdis, wequ), 
+		structData(gridOperation), intrs(gridOperation.getPointerToMesh()), 
+		dontTouch(true), dontTouchId(0)
+	{
+		initialize();
+	}
+	
+	
+	template<MeshType MT, typename CostClass>
+	simplification<Triangle, MT, CostClass>::simplification
+		(const MatrixXd & nds, const MatrixXi & els, const MatrixXd & loc, const VectorXd & val,
+		const Real & wgeo, const Real & wdis, const Real & wequ) :
+		gridOperation(nds, els, loc, val), costObj(&gridOperation, wgeo, wdis, wequ), 
+		structData(gridOperation), intrs(gridOperation.getPointerToMesh()), 
+		dontTouch(true), dontTouchId(0)
+	{
+		initialize();
+	}
+		
 	
 	//
 	// Initialization and refreshing methods
@@ -112,6 +156,38 @@ namespace geometry
 		// information and add it to a temporary list
 		for (auto edge : tmp_collapsingSet) 
 			getCost_f(edge.getId1(), edge.getId2()); 
+	}
+	
+	
+	template<MeshType MT, typename CostClass>
+	void simplification<Triangle, MT, CostClass>::initialize()
+	{
+		#ifdef NDEBUG
+			using namespace std::chrono;
+			high_resolution_clock::time_point start, stop;
+		#endif
+		
+		// Important control on coherence between the inputs:
+		// error if the CostClass supports distributed data but the
+		// mesh is purely geometrical
+		static_assert(std::is_base_of<bcost<Triangle, MT, CostClass>, CostClass>::value,
+			"CostClass must be coherent with the mesh type.");
+
+		// Create the set of collapsingEdge's ordered by cost
+		#ifndef NDEBUG
+			cout << "Initialize list of edges ordered by the associated collapsing cost ... ";
+			setupCollapsingSet();
+			cout << "done" << endl;
+		#else
+			start = high_resolution_clock::now();
+			setupCollapsingSet();
+			stop = high_resolution_clock::now();
+			auto dif_collapsingSet = duration_cast<milliseconds>(stop-start).count();
+			cout << "Initialization completed in " << dif_collapsingSet/1000 << " seconds." << endl;
+		#endif
+
+		// Define the fixed element
+		findDontTouchId();
 	}
 	
 	
@@ -1010,34 +1086,43 @@ namespace geometry
 		#endif
 		while (gridOperation.getCPointerToMesh()->getNumNodes() > numNodesMax)
 		{
-			// Take the first valid collapsing edge with the minimum cost
-			auto minCostEdge = collapsingSet.cbegin();
-			auto id1 = minCostEdge->getId1();
-			auto id2 = minCostEdge->getId2();
-			auto cPoint = minCostEdge->getCollapsingPoint();
+			if (collapsingSet.size() > 0)
+			{
+				// Take the first valid collapsing edge with the minimum cost
+				auto minCostEdge = collapsingSet.cbegin();
+				auto id1 = minCostEdge->getId1();
+				auto id2 = minCostEdge->getId2();
+				auto cPoint = minCostEdge->getCollapsingPoint();
 						
-			// Update the mesh, the connectivities, the structured data, CostClass object
-			// Re-compute cost for involved edges
-			update(id1, id2, cPoint);
+				// Update the mesh, the connectivities, the structured data, CostClass object
+				// Re-compute cost for involved edges
+				update(id1, id2, cPoint);
 			
-			#ifdef NDEBUG
-				// Update progress bar
-				Real progress((numNodesStart - gridOperation.getCPointerToMesh()->getNumNodes())
-					/ (static_cast<Real>(numNodesStart - numNodesMax)));
-				cout << "Simplification process  [";
-				UInt pos(barWidth * progress);
-				for (UInt i = 0; i < barWidth; ++i) 
-				{
-					if (i < pos) 
-						cout << "=";
-					else if (i == pos) 
-						cout << ">";
-					else 
-						cout << " ";
-				}
-				cout << "] " << UInt(progress * 100.0) << " %\r";
-				cout.flush();
-			#endif
+				#ifdef NDEBUG
+					// Update progress bar
+					Real progress((numNodesStart - gridOperation.getCPointerToMesh()->getNumNodes())
+						/ (static_cast<Real>(numNodesStart - numNodesMax)));
+					cout << "Simplification process  [";
+					UInt pos(barWidth * progress);
+					for (UInt i = 0; i < barWidth; ++i) 
+					{
+						if (i < pos) 
+							cout << "=";
+						else if (i == pos) 
+							cout << ">";
+						else 
+							cout << " ";
+					}
+					cout << "] " << UInt(progress * 100.0) << " %\r";
+					cout.flush();
+				#endif
+			}
+			else
+			{
+				// No valid edges left, then stop
+				cout << endl << "The process stopped prematurely since there are no valid edges left.";
+				break;
+			}
 		}
 		#ifdef NDEBUG
 		cout << endl;
@@ -1061,118 +1146,6 @@ namespace geometry
 		#endif
 		cout << "The mesh size passed from " << numNodesStart << " to " << 
 			gridOperation.getCPointerToMesh()->getNumNodes() << " nodes." << endl;
-		
-		// ... to file
-		if (!(file.empty()))
-			gridOperation.getPointerToMesh()->print(file);
-			//gridOperation.printMesh(file);
-	}
-	
-	
-	template<MeshType MT, typename CostClass>
-	void simplification<Triangle, MT, CostClass>::simplificate_greedy(const UInt & numNodesMax,
-		const UInt & K, const bool & enableDontTouch, const string & file)
-	{				
-		// Check if the current number of nodes is below the threshold
-		auto numNodesStart(gridOperation.getCPointerToMesh()->getNumNodes());
-		if (numNodesMax >= numNodesStart)
-		{
-			cout << "The number of mesh points is " << gridOperation.getCPointerToMesh()->getNumNodes()
-				<< ", already below the given threshold " << numNodesMax << endl;
-			return;
-		}
-						
-		//
-		// Run simplification
-		//
-		
-		dontTouch = enableDontTouch;
-		
-		cout << "Simplification process..." << endl;
-		#ifdef NDEBUG
-		using namespace std::chrono;
-		high_resolution_clock::time_point start = high_resolution_clock::now();
-		#endif
-				
-		// Iterative collapse until numNodeMax is reached
-		while (gridOperation.getCPointerToMesh()->getNumNodes() > numNodesMax)
-		{
-			//
-			// Take the first "non-interacting" K valid edges
-			//
-			// Two edges are said "non-interacting" if they do not share
-			// any of the nodes connected to one of the end-points 
-			
-			// Declare useful variables
-			UInt k(1);
-			vector<UInt> id1, id2;
-			vector<point3d> cPoint;
-			
-			// Reserve memory
-			id1.reserve(K);
-			id2.reserve(K);
-			cPoint.reserve(K);
-			
-			// Extract the minimum cost edge
-			auto minCostEdge = collapsingSet.cbegin();
-			id1.push_back(minCostEdge->getId1());
-			id2.push_back(minCostEdge->getId2());
-			cPoint.push_back(minCostEdge->getCollapsingPoint());
-			
-			// Initialize set of involved nodes
-			auto invNodes_v(gridOperation.getNodesInvolvedInEdgeCollapsing(id1[0],id2[0]));
-			set<UInt> invNodes(invNodes_v.cbegin(), invNodes_v.cend());
-			
-			// Extract the other K-1 edges
-			while ((k < K) && (++minCostEdge != collapsingSet.cend()))
-			{
-				// Extract edge end-points and involved nodes
-				auto id1_t(minCostEdge->getId1()), id2_t(minCostEdge->getId2());
-				auto invNodes_t(gridOperation.getNodesInvolvedInEdgeCollapsing(id1_t,id2_t));
-				
-				// Test admissibility of the new edge and possibly keep it
-				vector<UInt> shared;
-				set_intersection(invNodes.cbegin(), invNodes.cend(),
-					invNodes_t.cbegin(), invNodes_t.cend(), back_inserter(shared));
-				if (shared.empty())
-				{
-					// Extract the edge
-					id1.push_back(id1_t);
-					id2.push_back(id2_t);
-					cPoint.push_back(minCostEdge->getCollapsingPoint());
-					
-					// Update auxiliary variables
-					invNodes.insert(invNodes_t.cbegin(), invNodes_t.cend());
-					++k;
-				}
-			}
-									
-			// Update the mesh, the connectivities, the structured data, CostClass object
-			// Re-compute cost for involved edges
-			update(id1, id2, cPoint);
-		}
-				
-		#ifdef NDEBUG
-		high_resolution_clock::time_point stop = high_resolution_clock::now();
-		auto dif = duration_cast<milliseconds>(stop-start).count();
-		#endif
-		
-		//
-		// Refresh the mesh and the connections
-		//
-		
-		gridOperation.refresh();
-		
-		//
-		// Print ...
-		//
-		
-		// ... to screen
-		cout << "The mesh size passed from " << numNodesStart << " to " << 
-			gridOperation.getCPointerToMesh()->getNumNodes() << " nodes" << endl;
-		#ifdef NDEBUG
-		cout << "Simplification process completated in " <<  dif << " ms" << endl;
-		#endif
 		
 		// ... to file
 		if (!(file.empty()))
