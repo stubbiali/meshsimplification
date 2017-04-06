@@ -128,12 +128,16 @@ setup.simplification <- function(mesh, loc = NULL, val = NULL, wgeom = 1/3, wdis
 #'						carried out at the C++ level by the \code{meshsimplification} 
 #'						library.
 #'	@usage				run.simplification(x, numNodesMax, file = '')
-#'	@return				A SURFACE_MESH object, storing the simplified grid.
-#'	@return				List with data points locations onto the simplified grid.
+#'	@return				A list with the following fields:
+#'						- mesh: a SURFACE_MESH object, storing the simplified grid;
+#'						- locations: a #data-by-3 matrix with the locations of data points
+#'							onto the simplified grid
+#'						- qoi: a #elements-by-1 vector with the quantity of information
+#'							(QOI) for each triangle.
 #'	@export
 #'	@examples
 #'	## Instantiate a simplification object for the simplification of pawn geometry
-#'	## Suppose that the mesh file is placed in the R working folder
+#'	## Suppose that the mesh file is placed in the R working directory
 #'	## Components of the edge cost function are equally weighted
 #'	obj <- initialize.simplification('pawn.inp')
 #'	## Run the simplification strategy, reducing the mesh down to n = 1000 nodes
@@ -151,7 +155,10 @@ run.simplification <- function(x, numNodesMax, file = '')
 	# Get list of data points
 	locations <- get.data.locations(x)
 	
-	return(list(mesh = mesh, locations = locations))
+	# Get quantity of information for each triangle
+	qoi <- get.quantity.of.information(x)
+	
+	return(list(mesh = mesh, locations = locations, qoi = qoi))
 }
 
 
@@ -166,6 +173,11 @@ run.simplification <- function(x, numNodesMax, file = '')
 
 get.nodes <- function(x)
 {
+	# Preliminary check
+	if (class(x) != "simplification")
+		stop("The function takes an object of class simplification as input.")
+		
+	# Run		
 	out <- x$simplifier$getNodes()
 	return(out)
 }
@@ -182,6 +194,11 @@ get.nodes <- function(x)
 
 get.edges <- function(x)
 {
+	# Preliminary check
+	if (class(x) != "simplification")
+		stop("The function takes an object of class simplification as input.")
+		
+	# Run, converting from C++ 0-based indexing to R 1-based indexing
 	out <- x$simplifier$getEdges()
 	out < out + 1
 	return(out)
@@ -199,6 +216,11 @@ get.edges <- function(x)
 
 get.triangles <- function(x)
 {
+	# Preliminary check
+	if (class(x) != "simplification")
+		stop("The function takes an object of class simplification as input.")
+		
+	# Run, converting from C++ 0-based indexing to R 1-based indexing
 	out <- x$simplifier$getElems()
 	out <- out + 1
 	return(out)
@@ -215,6 +237,11 @@ get.triangles <- function(x)
 
 get.data.locations <- function(x)
 {
+	# Preliminary check
+	if (class(x) != "simplification")
+		stop("The function takes an object of class simplification as input.")
+		
+	# Run
 	out <- x$simplifier$getDataLocations()
 	return(out)
 }
@@ -230,6 +257,11 @@ get.data.locations <- function(x)
 
 get.observations <- function(x)
 {
+	# Preliminary check
+	if (class(x) != "simplification")
+		stop("The function takes an object of class simplification as input.")
+		
+	# Run
 	out <- x$simplifier$getObservations()
 	return(out)
 }
@@ -245,7 +277,11 @@ get.observations <- function(x)
 #'	@export
 
 get.quantity.of.information <- function(x)
-{
+	# Preliminary check
+	if (class(x) != "simplification")
+		stop("The function takes an object of class simplification as input.")
+		
+	# Run
 	out <- x$simplifier$getQuantityOfInformation()
 	return(out)
 }
@@ -261,6 +297,10 @@ get.quantity.of.information <- function(x)
 
 get.surface.mesh <- function(x)
 {
+	# Preliminary check
+	if (class(x) != "simplification")
+		stop("The function takes an object of class simplification as input.")
+		
 	# Extract nodes and triangles, differentiating between
 	# linear and quadratic Finite Elements
 	if (x$order == 1)

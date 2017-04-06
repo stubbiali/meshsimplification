@@ -195,7 +195,7 @@ namespace geometry
 		refreshData2Elem(old2new.second);
 		buildElem2Data();
 	}
-		
+				
 	
 	template<typename SHAPE>
 	void connect<SHAPE, MeshType::DATA>::clear()

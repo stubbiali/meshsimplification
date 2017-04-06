@@ -31,12 +31,15 @@ namespace geometry
 	template<>
 	void connect<Triangle, MeshType::DATA>::buildData2Elem_p()
 	{		
+		// Clear memory
+		data2elem.clear();
+		
 		// Allocate memory for data-element connections
 		data2elem.reserve(this->grid.getNumData());
 		
 		// Initialize class for structured data search
 		structuredData<Triangle> sd(&this->grid);
-		
+						
 		// Go through all data points
 		for (UInt i = 0; i < this->grid.getNumData(); ++i)
 		{
@@ -118,7 +121,7 @@ namespace geometry
 			if (data2elem.size() == i)
 			{
 				this->grid.setData(i, M_opt);
-				data2elem.emplace_back(vector<UInt>(id_opt), i);
+				data2elem.emplace_back(vector<UInt>(id_opt), i);	
 			}
 		}
 	}

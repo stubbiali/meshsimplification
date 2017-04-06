@@ -36,15 +36,13 @@ out <- run.simplification(obj, n1)
 
 nodes <- get.nodes(obj)
 triangles <- get.triangles(obj)
-#loc <- get.data.locations(obj)
+loc <- get.data.locations(obj)
 #val <- get.observations(obj)
 
 mesh <- list(nnodes = dim(nodes)[1], nodes = nodes, 
 		ntriangles = dim(triangles)[1], triangles = triangles, order = 1)
 class(mesh) <- "SURFACE_MESH"
 
-obj2 <- setup.simplification(mesh)
+obj2 <- setup.simplification(mesh, loc)
 out <- run.simplification(obj2, n2, oFile)
-
-
 

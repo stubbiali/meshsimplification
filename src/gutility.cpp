@@ -276,7 +276,7 @@ namespace geometry
 		//
 		
 		auto dist = abs(N*P - D);
-		if (dist > TOLL)
+		if (dist > 1e-10)
 		{
 			auto M(0.333 * (A+B+C));
 			return make_tuple(0, (P-M).norm2squared(), M);
@@ -308,7 +308,6 @@ namespace geometry
 			return make_tuple(0, (P-M).norm2squared(), M);
 		}
 		return make_tuple(in, 0., point3d());
-			
 	}
 	
 				
