@@ -1,5 +1,5 @@
 An iterative simplification procedure for surface grids 
-with associated data distributed over the surface
+augmented with distributed data
 =====================================================================
 
 For a detailed description of the method, please refer to:
@@ -81,8 +81,7 @@ R package
 
 This project comes also with the R package `MeshDataSimplification`, wrapping the C++ 
 library `meshsimplification`, thus providing a high-level access to its functionalities.
-To expose the C++ code to R, the `Rcpp` and `RcppEigen` API is used, so make sure you have the 
-`Rcpp` and `RcppEigen` packages correctly installed.
+To expose the C++ code to R, the `Rcpp` and `RcppEigen` API is used.
 
 The source code for the package is placed in the folder `RPackage/MeshDataSimplification`
 and its subfolders, namely:

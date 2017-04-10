@@ -208,6 +208,13 @@ namespace geometry
 			/*!	Method re-building collapsingSet, i.e. re-computing all the costs. */
 			void rebuildCollapsingSet();
 			
+			/*!	Method refreshing collapsingSet by applying an old-to-new map to
+				all nodes Id's. This method should be called any time the mesh gets
+				refreshed, i.e. the inactive nodes and elements are removed.
+				
+				\param old2new	old-to-new map for nodes Id's */
+			void refreshCollapsingSet(map<UInt,UInt> old2new);
+			
 			/*!	Method refreshing
 				<ol>
 				<li> the mesh
@@ -217,7 +224,7 @@ namespace geometry
 				<li> the set of collapseInfo's
 				<\ol> */
 			void refresh();
-			
+						
 			//
 			// Get methods
 			//

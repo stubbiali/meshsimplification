@@ -103,14 +103,17 @@ namespace geometry
 		
 	
 	template<typename SHAPE, MeshType MT>
-	void bconnect<SHAPE,MT>::refresh()
+	pair<map<UInt,UInt>, map<UInt,UInt>> bconnect<SHAPE,MT>::refresh()
 	{
-		// Refresh the mesh
-		grid.refresh();
+		// Refresh the mesh and get old-to-new maps for
+		// both nodes and elements Id's
+		auto old2new = grid.refresh();
 		
 		// Re-build all connections and the set of edges
 		buildNode2Node();
 		buildNode2Elem();
+		
+		return old2new;
 	}
 	
 	

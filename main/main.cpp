@@ -15,7 +15,7 @@ int main()
 	string oFile("results/pawn_test.inp");
 	
 	// Desired number of nodes
-	UInt numNodesMax(1400);
+	UInt numNodesMax(1000);
 	
 	// Simplificate!
 	#ifdef NDEBUG
@@ -24,7 +24,7 @@ int main()
 	
 	simplification<Triangle, MeshType::DATA, DataGeo> simplifier(iFile);
 	simplifier.simplificate(numNodesMax, true, oFile);
-		
+			
 	#ifdef NDEBUG
 	high_resolution_clock::time_point stop = high_resolution_clock::now();
 	auto dif = duration_cast<milliseconds>(stop-start).count();

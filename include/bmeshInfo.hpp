@@ -92,8 +92,10 @@ namespace geometry
 			// Refresh method
 			//
 			
-			/*!	Refresh the mesh and all the connections. */
-			void refresh();
+			/*!	Refresh the mesh and all the connections. 
+				\return		old-to-new map for nodes Id's
+				\return 	old-to-new map for elements Id's */
+			pair<map<UInt,UInt>, map<UInt,UInt>> refresh();
 						
 			//
 			// Print methods

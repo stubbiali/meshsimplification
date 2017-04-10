@@ -116,9 +116,9 @@ namespace geometry
 	//
 	
 	template<typename SHAPE, MeshType MT>
-	INLINE void bmeshInfo<SHAPE,MT>::refresh()
+	INLINE pair<map<UInt,UInt>, map<UInt,UInt>> bmeshInfo<SHAPE,MT>::refresh()
 	{
-		connectivity.refresh();
+		return connectivity.refresh();
 	}
 	
 	

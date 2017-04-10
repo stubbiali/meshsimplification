@@ -99,6 +99,23 @@ namespace geometry
 	
 	
 	template<typename SHAPE, MeshType MT, typename D>
+	void bcost<SHAPE,MT,D>::refreshCInfoList(map<UInt,UInt> old2new)
+	{
+		// Copy cInfoList into an auxiliary container
+		unordered_set<collapseInfo> cInfoList_t(cInfoList.cbegin(), cInfoList.cend());
+		
+		// Clear cInfoList
+		cInfoList.clear();
+		
+		// Re-insert all collapseInfo's to cInfoList, applying the old-to-new
+		// map to the nodes but leaving the costs and the collapsing points unchanged
+		for (auto cInfo : cInfoList_t)
+			cInfoList.emplace(old2new[cInfo.getId1()], old2new[cInfo.getId2()],
+				cInfo.getCost(), cInfo.getCollapsingPoint()); 
+	}
+	
+	
+	template<typename SHAPE, MeshType MT, typename D>
 	INLINE void bcost<SHAPE,MT,D>::clear()
 	{
 		static_cast<D *>(this)->imp_clear();

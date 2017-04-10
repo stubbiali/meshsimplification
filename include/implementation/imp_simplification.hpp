@@ -119,7 +119,7 @@ namespace geometry
 				// Update progress bar
 				++counter;
 				Real progress(counter / (static_cast<Real>(numEdges)));
-				cout << "Initialization          [";
+				cout << "Initialize list of contractions      [";
 				UInt pos(barWidth * progress);
 				for (UInt i = 0; i < barWidth; ++i) 
 				{
@@ -183,11 +183,29 @@ namespace geometry
 			setupCollapsingSet();
 			stop = high_resolution_clock::now();
 			auto dif_collapsingSet = duration_cast<milliseconds>(stop-start).count();
-			cout << "Initialization completed in " << dif_collapsingSet/1000 << " seconds." << endl;
+			cout << "Initialization of list of contractions completed in " << dif_collapsingSet/1000 << " seconds." << endl;
 		#endif
 
 		// Define the fixed element
 		findDontTouchId();
+	}
+	
+	
+	template<MeshType MT, typename CostClass>
+	void simplification<Triangle, MT, CostClass>::refreshCollapsingSet
+		(map<UInt,UInt> old2new)
+	{
+		// Copy collapsingSet into an auxiliary container
+		set<collapsingEdge> collapsingSet_t(collapsingSet.cbegin(), collapsingSet.cend());
+		
+		// Clear collapsingSet
+		collapsingSet.clear();
+		
+		// Re-insert all collapsingEdge's to collapsingSet, applying the old-to-new
+		// map to the nodes but leaving the costs and the collapsing points unchanged
+		for (auto cEdge : collapsingSet_t)
+			collapsingSet.emplace(old2new[cEdge.getId1()], old2new[cEdge.getId2()],
+				cEdge.getCost(), cEdge.getCollapsingPoint()); 
 	}
 	
 	
@@ -1102,7 +1120,7 @@ namespace geometry
 					// Update progress bar
 					Real progress((numNodesStart - gridOperation.getCPointerToMesh()->getNumNodes())
 						/ (static_cast<Real>(numNodesStart - numNodesMax)));
-					cout << "Simplification process  [";
+					cout << "Simplification process               [";
 					UInt pos(barWidth * progress);
 					for (UInt i = 0; i < barWidth; ++i) 
 					{
@@ -1131,10 +1149,13 @@ namespace geometry
 		#endif
 		
 		//
-		// Refresh the mesh and the connections
+		// Refresh the mesh, the connections, cInfoList, collapsingSet and fixed element
 		//
 		
-		gridOperation.refresh();
+		auto old2new = gridOperation.refresh();
+		costObj.refreshCInfoList(old2new.first);
+		refreshCollapsingSet(old2new.first);
+		dontTouchId = old2new.second[dontTouchId];
 		
 		//
 		// Print ...

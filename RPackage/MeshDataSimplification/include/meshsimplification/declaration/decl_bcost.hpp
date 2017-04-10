@@ -195,6 +195,13 @@ namespace geometry
 							FALSE otherwise */
 			bool toUpdate() const;
 			
+			/*!	Refresh cInfoList by applying an old-to-new map to all nodes Id's.
+				This method should be called any time the underlying mesh gets refreshed,
+				i.e. the inactive nodes and elements are removed.
+				
+				\param old2new	old-to-new map for nodes Id's */
+			void refreshCInfoList(map<UInt,UInt> old2new);
+			
 			/*!	Clear the collapseInfo's list.
 				The implementation is delegated to the derived class. */
 			void clear(); 

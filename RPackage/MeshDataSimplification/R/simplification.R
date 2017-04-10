@@ -146,6 +146,10 @@ setup.simplification <- function(mesh, loc = NULL, val = NULL, wgeom = 1/3, wdis
 
 run.simplification <- function(x, numNodesMax, file = '')
 {
+	# Preliminary check
+	if (class(x) != "simplification")
+		stop("The function takes an object of class simplification as input.")
+		
 	# Run the simplification procedure
 	x$simplifier$simplificate(numNodesMax, file)
 	
@@ -277,6 +281,7 @@ get.observations <- function(x)
 #'	@export
 
 get.quantity.of.information <- function(x)
+{
 	# Preliminary check
 	if (class(x) != "simplification")
 		stop("The function takes an object of class simplification as input.")

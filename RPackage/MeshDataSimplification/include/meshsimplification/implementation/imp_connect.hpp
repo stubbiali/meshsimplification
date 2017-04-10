@@ -184,9 +184,10 @@ namespace geometry
 	
 	
 	template<typename SHAPE>
-	void connect<SHAPE, MeshType::DATA>::refresh()
+	pair<map<UInt,UInt>, map<UInt,UInt>> connect<SHAPE, MeshType::DATA>::refresh()
 	{
-		// Refresh the mesh
+		// Refresh the mesh and get old-to-new maps for
+		// both nodes and elements Id's
 		auto old2new = this->grid.refresh();
 		
 		// Re-build all connections and the set of edges
@@ -194,6 +195,8 @@ namespace geometry
 		this->buildNode2Elem();
 		refreshData2Elem(old2new.second);
 		buildElem2Data();
+		
+		return old2new;
 	}
 				
 	

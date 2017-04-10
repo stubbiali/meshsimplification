@@ -177,8 +177,10 @@ namespace geometry
 				prefered whenever data locations do not coincide with grid nodes. */
 			void buildElem2Data_p();
 					
-			/*! Re-build all connections. */
-			virtual void refresh();
+			/*! Re-build all connections. 
+				\return 	old-to-new map for nodes Id's
+				\return		old-to-new map for elements Id's */
+			virtual pair<map<UInt,UInt>, map<UInt,UInt>> refresh();
 			
 			/*! Clear all connections and the set of edges. */
 			virtual void clear();

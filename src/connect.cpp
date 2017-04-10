@@ -1,6 +1,10 @@
 /*!	\file	connect.cpp
 	\brief	Specialization for some members of class connect. */
 	
+#ifdef NDEBUG
+#include <chrono>
+#endif
+	
 #include "connect.hpp"
 #include "structuredData.hpp"
 #include "gutility.hpp"
@@ -31,6 +35,11 @@ namespace geometry
 	template<>
 	void connect<Triangle, MeshType::DATA>::buildData2Elem_p()
 	{		
+		#ifdef NDEBUG
+			using namespace std::chrono;
+			high_resolution_clock::time_point start = high_resolution_clock::now();
+		#endif
+		
 		// Clear memory
 		data2elem.clear();
 		
@@ -39,6 +48,10 @@ namespace geometry
 		
 		// Initialize class for structured data search
 		structuredData<Triangle> sd(&this->grid);
+		
+		#ifdef NDEBUG
+			UInt barWidth(40);
+		#endif
 						
 		// Go through all data points
 		for (UInt i = 0; i < this->grid.getNumData(); ++i)
@@ -123,6 +136,30 @@ namespace geometry
 				this->grid.setData(i, M_opt);
 				data2elem.emplace_back(vector<UInt>(id_opt), i);	
 			}
+			
+			// Update progress bar
+			#ifdef NDEBUG
+				Real progress((i+1) / static_cast<Real>(this->grid.getNumData()));
+				cout << "Initialize data-element connections  [";
+				UInt pos(barWidth * progress);
+				for (UInt i = 0; i < barWidth; ++i) 
+				{
+					if (i < pos) 
+						cout << "=";
+					else if (i == pos) 
+						cout << ">";
+					else 
+						cout << " ";
+				}
+				cout << "] " << UInt(progress * 100.0) << " %\r";
+				cout.flush();
+			#endif
 		}
+		#ifdef NDEBUG
+			cout << endl;
+			high_resolution_clock::time_point stop = high_resolution_clock::now();
+			auto dif = duration_cast<milliseconds>(stop-start).count();
+			cout << "Initialization of data-element connections completed in " << dif/1000 << " seconds." << endl;
+		#endif
 	}
 }
