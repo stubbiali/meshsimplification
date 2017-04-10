@@ -27,11 +27,15 @@ Depends:
 	R (>= 3.0.0)
 LinkingTo: 
 	Rcpp (>= 0.9.11), RcppEigen
-Description: An iterative edge collapse-based simplification strategy for 
-	triangular surface grids with distributed data. For the selection of the
-	edge to contract at each iteration, an edge cost function is introduced,
-	acconting for geometric and statistical considerations. The library can 
-	handle both genus zero and higher genus surfaces.
+Description: Iterative simplification strategy for surface triangular grids augmented 
+	with distributed data. Each iteration corresponds to an edge collapse where
+	the selection of the edge to contract derives from a cost functional based 
+	on both geometric and statistical-based considerations. 
+	The library can	handle both zero and higher genus surfaces.
+Reference: Dassi, F., Ettinger, B., Perotto, S., Sangalli, L.M. (2015),
+	A mesh simplification strategy for a spatial regression analysis over the 
+	cortical surface of the brain, Applied Numerical Mathematics, Vol. 90, pp. 111-131.	
+	
 License:
 Copyright:
 NeedsCompilation: yes
