@@ -107,7 +107,9 @@ from the project root folder. Then, move to the `RPackage/MeshDataSimplification
 
 	sudo R -e "library(devtools); install()" --silent
 	
-Observe that the R package `devtools` is required.
+Observe that the R package `devtools` is required. To check if the installation has been successfull,
+run one of the scripts contained in the folder `RPackage/RScript`, aiming to exemplify the use of the
+functions provided by the package. 
 
 Lastly, to build the Roxygen documentation and place it in `RPackage/MeshDataSimplification/man/`,
 run
