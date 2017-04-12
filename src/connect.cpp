@@ -50,7 +50,7 @@ namespace geometry
 		structuredData<Triangle> sd(&this->grid);
 		
 		#ifdef NDEBUG
-			UInt barWidth(40);
+			UInt barWidth(35);
 		#endif
 						
 		// Go through all data points
@@ -140,7 +140,7 @@ namespace geometry
 			// Update progress bar
 			#ifdef NDEBUG
 				Real progress((i+1) / static_cast<Real>(this->grid.getNumData()));
-				cout << "Initialize data-element connections  [";
+				cout << "Set data-element connections  [";
 				UInt pos(barWidth * progress);
 				for (UInt i = 0; i < barWidth; ++i) 
 				{

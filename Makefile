@@ -22,7 +22,7 @@ MAIN_OBJ_DIR=$(OBJ_DIR)/main
 # which will store the project library
 LIB_DIR=lib
 # Path to Eigen directory
-EIGEN_DIR=$(LIB_DIR)/Eigen
+EIGEN_DIR=$(mkEigenInc)
 
 # Directories which will store binary files for tests and executables
 BIN_DIR=bin
@@ -95,11 +95,18 @@ STATIC_STL=no
 # Set the compiler
 CXX=g++
 
+# Check whether the Eigen directory actually exists
+ifneq ("$(wildcard $(EIGEN_DIR)/Eigen/Eigen)","")
+	EIGEN_INC=$(EIGEN_DIR)
+else
+	EIGEN_INC=$(LIB_DIR)/Eigen
+endif
+
 # Flags for the compiler
 ifeq ($(RELEASE),yes)
-	CXXFLAGS=-std=c++11 -DNDEBUG -O3 -ftree-vectorize -I $(LIB_INC_DIR) -I $(EIGEN_DIR)
+	CXXFLAGS=-std=c++11 -DNDEBUG -O3 -ftree-vectorize -I $(LIB_INC_DIR) -I $(EIGEN_INC)
 else
-	CXXFLAGS=-std=c++11 -g -Werror -I $(LIB_INC_DIR) -I $(EIGEN_DIR)
+	CXXFLAGS=-std=c++11 -g -Werror -I $(LIB_INC_DIR) -I $(EIGEN_INC)
 endif
 	
 ifeq ($(ENABLE_SELF_INTERSECTIONS),yes)
@@ -213,7 +220,7 @@ main: $(MAIN_BIN)
 #
 
 clean:
-	@$(RM) -r $(OBJ_DIR) $(BIN_DIR) $(LIB_DIR)/lib$(LIB).* $(DOC_DIR)/Doxyfile $(DOC_DIR)/html $(DOC_DIR)/latex $(R_PACKAGE_LIB_DIR)/lib$(LIB).so.$(VRS) $(R_PACKAGE_DIR)/man $(R_DIR)/MeshDataSimplification_* $(R_PACKAGE_SRC_DIR)/*.o
+	@$(RM) -r $(OBJ_DIR) $(BIN_DIR) $(LIB_DIR)/lib$(LIB).* $(DOC_DIR)/Doxyfile $(DOC_DIR)/html $(DOC_DIR)/latex $(R_PACKAGE_LIB_DIR)/lib$(LIB).so.$(VRS) $(R_PACKAGE_DIR)/man $(R_DIR)/MeshDataSimplification_* $(R_PACKAGE_SRC_DIR)/*.o $(R_PACKAGE_LIB_DIR)/*.so
 	
 distclean: clean
 	@$(RM) /usr/lib/lib$(LIB)*

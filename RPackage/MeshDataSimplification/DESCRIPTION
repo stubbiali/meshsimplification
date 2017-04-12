@@ -35,7 +35,6 @@ Description: Iterative simplification strategy for surface triangular grids augm
 Reference: Dassi, F., Ettinger, B., Perotto, S., Sangalli, L.M. (2015),
 	A mesh simplification strategy for a spatial regression analysis over the 
 	cortical surface of the brain, Applied Numerical Mathematics, Vol. 90, pp. 111-131.	
-	
 License:
 Copyright:
 NeedsCompilation: yes

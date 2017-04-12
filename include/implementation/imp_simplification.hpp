@@ -119,7 +119,7 @@ namespace geometry
 				// Update progress bar
 				++counter;
 				Real progress(counter / (static_cast<Real>(numEdges)));
-				cout << "Initialize list of contractions      [";
+				cout << "Setup                         [";
 				UInt pos(barWidth * progress);
 				for (UInt i = 0; i < barWidth; ++i) 
 				{
@@ -183,7 +183,7 @@ namespace geometry
 			setupCollapsingSet();
 			stop = high_resolution_clock::now();
 			auto dif_collapsingSet = duration_cast<milliseconds>(stop-start).count();
-			cout << "Initialization of list of contractions completed in " << dif_collapsingSet/1000 << " seconds." << endl;
+			cout << "Setup for the simplification process completed in " << dif_collapsingSet/1000 << " seconds." << endl;
 		#endif
 
 		// Define the fixed element
@@ -1100,7 +1100,7 @@ namespace geometry
 
 		// Iterative collapse until numNodeMax is reached
 		#ifdef NDEBUG
-			UInt barWidth(40);
+			UInt barWidth(35);
 		#endif
 		while (gridOperation.getCPointerToMesh()->getNumNodes() > numNodesMax)
 		{
@@ -1120,7 +1120,7 @@ namespace geometry
 					// Update progress bar
 					Real progress((numNodesStart - gridOperation.getCPointerToMesh()->getNumNodes())
 						/ (static_cast<Real>(numNodesStart - numNodesMax)));
-					cout << "Simplification process               [";
+					cout << "Simplification process        [";
 					UInt pos(barWidth * progress);
 					for (UInt i = 0; i < barWidth; ++i) 
 					{
