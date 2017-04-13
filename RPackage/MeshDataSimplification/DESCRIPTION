@@ -4,7 +4,7 @@ Date: 2017-04-01
 Title: Simplification Strategy For Surface Grids With Distributed Data
 Authors@R: c(
 	person("Franco", "Dassi", 
-		email = "", role = "aut"),
+		email = "franco.dassi@unimib.it", role = "aut"),
 	person("Bree", "Ettinger", 
 		email = "", role = "aut"),
 	person("Marco", "Martinolli", 
