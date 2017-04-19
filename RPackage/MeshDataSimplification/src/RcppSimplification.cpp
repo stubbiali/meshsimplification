@@ -82,6 +82,34 @@ IntegerMatrix RcppSimplification::getEdges() const
 }
 
 
+NumericMatrix RcppSimplification::getEndPoints() const
+{
+	// Get list of edges
+	auto edges(this->simplifier.getCPointerToConnectivity()->getEdges());
+	
+	// Extract end-points for each edge and store them 
+	// in a #edges-by-6 matrix, where the first (last) three
+	// columns store the coordinates of the first (second) end-point
+	NumericMatrix out(edges.size(),6);
+	for (UInt i = 0; i < edges.size(); ++i)
+	{
+		// First end-point
+		auto P(this->simplifier.getCPointerToMesh()->getNode(edges[i][0]));
+		out(i,0) = P[0];
+		out(i,1) = P[1];
+		out(i,2) = P[2];
+		
+		// Second end-point
+		auto Q(this->simplifier.getCPointerToMesh()->getNode(edges[i][1]));
+		out(i,3) = Q[0];
+		out(i,4) = Q[1];
+		out(i,5) = Q[2];
+	}
+	
+	return out;
+}
+
+
 IntegerMatrix RcppSimplification::getElems() const
 {
 	// Extract number of elements as vector<geoElement<Triangle>>
@@ -95,6 +123,54 @@ IntegerMatrix RcppSimplification::getElems() const
 		out(i,0) = elem[0];
 		out(i,1) = elem[1];
 		out(i,2) = elem[2];
+	}
+	
+	return out;
+}
+
+
+NumericMatrix RcppSimplification::getElemsVertices() const
+{
+	// Fill a (4*#triangles-1)-by-3 matrix where:
+	// - the (4*i-3)-th row stores the coordinates of the 
+	//   first vertex of the i-th triangle
+	// - the (4*i-2)-th row stores the coordinates of the 
+	//   second vertex of the i-th triangle
+	// - the (4*i-1)-th row stores the coordinates of the 
+	//   third vertex of the i-th triangle
+	// - the 4*i-th row stores NA's if i < #triangles
+	auto nt(this->simplifier.getCPointerToMesh()->getNumElems());
+	NumericMatrix out(4*nt-1,3);
+	for (UInt i = 0; i < nt; ++i)
+	{
+		// Extract triangle
+		auto t(this->simplifier.getCPointerToMesh()->getElem(i));
+		
+		// Extract first vertex
+		auto V1(this->simplifier.getCPointerToMesh()->getNode(t[0]));
+		out(4*i,0) = V1[0];
+		out(4*i,1) = V1[1];
+		out(4*i,2) = V1[2];
+		
+		// Extract second vertex
+		auto V2(this->simplifier.getCPointerToMesh()->getNode(t[1]));
+		out(4*i+1,0) = V2[0];
+		out(4*i+1,1) = V2[1];
+		out(4*i+1,2) = V2[2];
+		
+		// Extract third vertex
+		auto V3(this->simplifier.getCPointerToMesh()->getNode(t[2]));
+		out(4*i+2,0) = V3[0];
+		out(4*i+2,1) = V3[1];
+		out(4*i+2,2) = V3[2];
+		
+		if (i < nt-1)
+		{
+			// Set last row of the chunk to NA's
+			out(4*i+3,0) = NA_REAL;
+			out(4*i+3,1) = NA_REAL;
+			out(4*i+3,2) = NA_REAL;
+		}
 	}
 	
 	return out;

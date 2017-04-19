@@ -1,5 +1,6 @@
 useDynLib(MeshDataSimplification)
+import(Rcpp)
+import(plot3D)
 exportPattern("^[[:alpha:]]+")
-import(methods, Rcpp)
 export(setup.simplification, setup.simplification.from.file, run.simplification)
 export(get.nodes, get.edges, get.triangles, get.data.locations, get.observations, get.quantity.of.information)

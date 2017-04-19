@@ -1,20 +1,13 @@
 Package: MeshDataSimplification
 Version: 0.1
 Date: 2017-04-01
-Title: Simplification Strategy For Surface Grids With Distributed Data
-Authors@R: c(
-	person("Franco", "Dassi", 
-		email = "franco.dassi@unimib.it", role = "aut"),
-	person("Bree", "Ettinger", 
-		email = "", role = "aut"),
-	person("Marco", "Martinolli", 
-		email = "marco.martinolli@mail.polimi.it", role = "aut"),
-	person("Simona", "Perotto", 
-		email = "simona.perotto@polimi.it", role = "aut"),
-	person("Laura M.", "Sangalli", 
-		email = "laura.sangalli@polimi.it", role = "aut"),
-	person("Stefano", "Ubbiali", 
-		email = "stefano.ubbiali@mail.polimi.it", role = c("aut","cre")))
+Title: Simplification Strategy for Surface Grids Augmented with Distributed Data
+Authors@R: c(person("Franco", "Dassi", email = "franco.dassi@unimib.it", role = "aut"),
+	person("Bree", "Ettinger", email = "", role = "aut"),
+	person("Marco", "Martinolli", email = "marco.martinolli@mail.polimi.it", role = "aut"),
+	person("Simona", "Perotto", email = "simona.perotto@polimi.it", role = "aut"),
+	person("Laura M.", "Sangalli", email = "laura.sangalli@polimi.it", role = "aut"),
+	person("Stefano", "Ubbiali", email = "stefano.ubbiali@mail.polimi.it", role = c("aut","cre")))
 Author:
 	Franco Dassi [aut],
 	Bree Ettinger [aut],
@@ -24,7 +17,7 @@ Author:
 	Stefano Ubbiali [aut, cre]
 Maintainer: Stefano Ubbiali <stefano.ubbiali@mail.polimi.it>
 Depends: 
-	R (>= 3.0.0)
+	R (>= 3.0.2), Rcpp (>= 0.9.11), plot3D
 LinkingTo: 
 	Rcpp (>= 0.9.11), RcppEigen
 Description: Iterative simplification strategy for surface triangular grids augmented 
@@ -32,10 +25,11 @@ Description: Iterative simplification strategy for surface triangular grids augm
 	the selection of the edge to contract derives from a cost functional based 
 	on both geometric and statistical-based considerations. 
 	The library can	handle both zero and higher genus surfaces.
-Reference: Dassi, F., Ettinger, B., Perotto, S., Sangalli, L.M. (2015),
-	A mesh simplification strategy for a spatial regression analysis over the 
-	cortical surface of the brain, Applied Numerical Mathematics, Vol. 90, pp. 111-131.	
-License:
+	For a detailed description of the algorithm, please refer to:
+	Dassi, F., Ettinger, B., Perotto, S., Sangalli, L.M. (2015),
+	A mesh simplification strategy for a spatial regression analysis over the  cortical surface of the brain, 
+	Applied Numerical Mathematics, Vol. 90, pp. 111-131.	
+License: CC BY-NC-SA 4.0
 Copyright:
 NeedsCompilation: yes
 SystemRequirements: C++11

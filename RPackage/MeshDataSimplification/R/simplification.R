@@ -1,7 +1,8 @@
-#'	Create a simplification structure from file
+#'	Initialize the simplification framework from file
 #' 
-#'	@param	file	A string reporting the absolute or relative path to the input mesh;
-#' 					.inp and .vtk file formats are supported.
+#'	@param	file	Absolute or relative path to the input mesh; .inp and .vtk file formats are supported.
+#'	@param	index	Either '0' or '1', saying whether vertices Id's are enumerated according to a 0-based 
+#'					or 1-based indexing, respectively. Default is '1'.
 #'	@param	wgeom	Weight for the geometric component of the edge cost function;
 #'					default is 1/3. Note that the all weights should be positive and
 #' 					sum up to one.
@@ -11,17 +12,24 @@
 #'	@param	wequi	Weight for the data equidistribution component of the edge cost function;
 #'					default is 1/3. Note that the all weights should be positive and
 #' 					sum up to one.
-#'	@description	This function instantiates a class storing all informations regarding
-#'					a surface two dimensional grid and useful to run the simplification process.
+#'	@description	This function instantiates an object of class \code{simplification}, holding all informations regarding
+#'					a surface two dimensional grid, and useful to run the simplification process.
 #'					This function heavily relies on \code{RcppSimplification} - a wrapper for the
 #'					template class \code{simplification<Triangle, MeshType::DATA, DataGeo>} 
 #'					provided by the C++ library \code{meshsimplification}.
-#'	@usage			setup.simplification.from.file(file, wgeom = 1/3, wdisp = 1/3, wequi = 1/3)
+#'	@seealso		\code{\link{plot.surface.mesh}}, \code{\link{run.simplification}}
+#'	@usage			setup.simplification.from.file(file, index = 1, wgeom = 1/3, wdisp = 1/3, wequi = 1/3)
 #'	@return 		An object of class simplification, provided with the following fields:
-#'					\item{\code{simplifier}} An object of class \code{RcppSimplification}
+#'					\item{\code{simplifier}}{An object of class \code{RcppSimplification}.}
+#'					\item{\code{order}}{Either '1' or '2', saying whether each triangle should be represented 
+#'					through three points (the vertices) or six points (the vertices plus 
+#'					the midpoints of the edges). These representations respectively allow 
+#'					to build a linear or quadratic Finite Element basis over the mesh.
+#'					In case of the simplification framework initialized from file, the
+#'					order is supposed to be '1'.}
 #'	@export
 
-setup.simplification.from.file <- function(file, wgeom = 1/3, wdisp = 1/3, wequi = 1/3)
+setup.simplification.from.file <- function(file, index = 1, wgeom = 1/3, wdisp = 1/3, wequi = 1/3)
 {
 	# Check whether the weights sum to one
 	s <- wgeom + wdisp + wequi
@@ -41,7 +49,7 @@ setup.simplification.from.file <- function(file, wgeom = 1/3, wdisp = 1/3, wequi
 }
 
 
-#'	Create a simplification structure from a SURFACE_MESH object
+#'	Initialize the simplification framework from an object of class SURFACE_MESH
 #' 
 #'	@param	mesh	A SURFACE_MESH object.
 #'	@param	loc 	#data-by-3 vector with data locations; default is NULL, i.e. locations
@@ -57,15 +65,36 @@ setup.simplification.from.file <- function(file, wgeom = 1/3, wdisp = 1/3, wequi
 #'	@param	wequi	Weight for the data equidistribution component of the edge cost function;
 #'					default is 1/3. Note that the all weights should be positive and
 #' 					sum up to one.
-#'	@description	This function instantiates a class storing all informations regarding
-#'					a surface two dimensional grid and useful to run the simplification process.
+#'	@description	This function instantiates an object of class \code{simplification}, holding all informations regarding
+#'					a surface two dimensional grid, and useful to run the simplification process.
 #'					This function heavily relies on \code{RcppSimplification} - a wrapper for the
 #'					template class \code{simplification<Triangle, MeshType::DATA, DataGeo>} 
 #'					provided by the C++ library \code{meshsimplification}.
 #'	@usage			setup.simplification(mesh, loc = NULL, val = NULL, wgeom = 1/3, wdisp = 1/3, wequi = 1/3)
+#'	@seealso		\code{\link{plot.surface.mesh}}, \code{\link{run.simplification}}
 #'	@return 		An object of class simplification, provided with the following fields:
-#'					\item{\code{simplifier}} An object of class \code{RcppSimplification}
+#'					\item{\code{simplifier}}{An object of class \code{RcppSimplification}.}
+#'					\item{\code{order}}{Either '1' or '2', saying whether each triangle should be represented 
+#'					through three points (the vertices) or six points (the vertices plus 
+#'					the midpoints of the edges). These representations respectively allow 
+#'					to build a linear or quadratic Finite Element basis over the mesh.
+#'					The Finite Element order is determined from the input SURFACE_MESH object.}
 #'	@export
+#'	@examples
+#'	## Instantiate an object of class simplification for the simplification of a pawn geometry; 
+#'	## suppose that the components of the edge cost function are equally weighted
+#'	data(pawn)
+#'	obj <- setup.simplification(mesh)
+#'	## Plot the original mesh
+#'	plot.surface.mesh(obj, main = "Original mesh, 2522 nodes")
+#'	## Run the simplification strategy, reducing the mesh down to n = 1500 nodes
+#'	run.simplification(obj, 1500)
+#'	## Plot the simplified mesh
+#'	plot.surface.mesh(obj, main = "Simplified mesh, 1500 nodes")
+#'	## Resume the simplification procedure, reducing the mesh down to n = 1000 nodes
+#'	run.simplification(obj, 1000)
+#'	## Plot the simplified mesh
+#'	plot.surface.mesh(obj, main = "Simplified mesh, 1000 nodes")
 
 setup.simplification <- function(mesh, loc = NULL, val = NULL, wgeom = 1/3, wdisp = 1/3, wequi = 1/3)
 {
@@ -116,7 +145,7 @@ setup.simplification <- function(mesh, loc = NULL, val = NULL, wgeom = 1/3, wdis
 #'	Run the simplification process
 #'
 #'	@param	x			An object of class \code{simplification}, created through 
-#'						\code{setup.simplification} or \code{setup.simplification.from.file}.
+#'						\code{\link{setup.simplification}} or \code{\link{setup.simplification.from.file}}.
 #'	@param	numNodesMax	Final number of nodes.
 #'	@param	file		String specifying the path to the location where the decimated
 #'						mesh will be stored; .inp file format supported. If the path
@@ -129,20 +158,27 @@ setup.simplification <- function(mesh, loc = NULL, val = NULL, wgeom = 1/3, wdis
 #'						library.
 #'	@usage				run.simplification(x, numNodesMax, file = '')
 #'	@return				A list with the following fields:
-#'						- mesh: a SURFACE_MESH object, storing the simplified grid;
-#'						- locations: a #data-by-3 matrix with the locations of data points
-#'							onto the simplified grid
-#'						- qoi: a #elements-by-1 vector with the quantity of information
-#'							(QOI) for each triangle.
+#'						\item{mesh}{a SURFACE_MESH object, storing the simplified grid;}
+#'						\item{locations}{a #data-by-3 matrix with the locations of data points
+#'						onto the simplified grid;}
+#'						\item{qoi}{a #elements-by-1 vector with the quantity of information
+#'						(QOI) for each triangle.}
 #'	@export
 #'	@examples
-#'	## Instantiate a simplification object for the simplification of pawn geometry
-#'	## Suppose that the mesh file is placed in the R working directory
-#'	## Components of the edge cost function are equally weighted
-#'	obj <- initialize.simplification('pawn.inp')
-#'	## Run the simplification strategy, reducing the mesh down to n = 1000 nodes
-#'	## Once the procedure is over, print the mesh to file
-#'	run.simplification(1000, 'pawn_simplified.inp')
+#'	## Instantiate an object of class simplification for the simplification of a pawn geometry; 
+#'	## suppose that the components of the edge cost function are equally weighted
+#'	data(pawn)
+#'	obj <- setup.simplification(mesh)
+#'	## Plot the original mesh
+#'	plot.surface.mesh(obj, main = "Original mesh, 2522 nodes")
+#'	## Run the simplification strategy, reducing the mesh down to n = 1500 nodes
+#'	run.simplification(obj, 1500)
+#'	## Plot the simplified mesh
+#'	plot.surface.mesh(obj, main = "Simplified mesh, 1500 nodes")
+#'	## Resume the simplification procedure, reducing the mesh down to n = 1000 nodes
+#'	run.simplification(obj, 1000)
+#'	## Plot the simplified mesh
+#'	plot.surface.mesh(obj, main = "Simplified mesh, 1000 nodes")
 
 run.simplification <- function(x, numNodesMax, file = '')
 {
@@ -169,10 +205,9 @@ run.simplification <- function(x, numNodesMax, file = '')
 #'	Get the list of nodes
 #'
 #'	@param	x	An object of class simplification, created through
-#'				\code{setup.simplification} or \code{setup.simplification.from.file}.
+#'				\code{\link{setup.simplification}} or \code{\link{setup.simplification.from.file}}.
 #'	@usage		get.nodes(x)
-#'	@return		A #nodes-by-3 matrix, where the i-th row stores
-#'				the coordinates of the i-th node.	
+#'	@return		A #nodes-by-3 matrix, where the i-th row stores the coordinates of the i-th node.	
 #'	@export
 
 get.nodes <- function(x)
@@ -190,10 +225,9 @@ get.nodes <- function(x)
 #' Get the list of edges
 #'
 #'	@param	x	An object of class simplification, created through
-#'				\code{setup.simplification} or \code{setup.simplification.from.file}.
+#'				\code{\link{setup.simplification}} or \code{\link{setup.simplification.from.file}}.
 #'	@usage		get.edges(x)
-#'	@return		A #edges-by-2 matrix, where the i-th row stores
-#'				the Id's of the end-points of the i-th edge.	
+#'	@return		A #edges-by-2 matrix, where the i-th row stores the Id's of the end-points of the i-th edge.	
 #'	@export
 
 get.edges <- function(x)
@@ -212,10 +246,9 @@ get.edges <- function(x)
 #'	Get the list of elements
 #'
 #'	@param	x	An object of class simplification, created through
-#'				\code{setup.simplification} or \code{setup.simplification.from.file}.
+#'				\code{\link{setup.simplification}} or \code{\link{setup.simplification.from.file}}.
 #'	@usage		get.triangles(x)
-#'	@return		A #elements-by-3 matrix, where the i-th row	stores
-#'				the Id's of the vertices of the i-th triangle.
+#'	@return		A #elements-by-3 matrix, where the i-th row	stores the Id's of the vertices of the i-th triangle.
 #'	@export
 
 get.triangles <- function(x)
@@ -234,7 +267,7 @@ get.triangles <- function(x)
 #'	Get the list of data points locations
 #'
 #'	@param	x	An object of class simplification, created through
-#'				\code{setup.simplification} or \code{setup.simplification.from.file}.
+#'				\code{\link{setup.simplification}} or \code{\link{setup.simplification.from.file}}.
 #'	@usage		get.data.locations(x)
 #'	@return		A #data-by-3 matrix storing the coordinates of data points locations.
 #'	@export	
@@ -254,7 +287,7 @@ get.data.locations <- function(x)
 #'	Get the list of observations
 #'
 #'	@param	x	An object of class simplification, created through
-#'				\code{setup.simplification} or \code{setup.simplification.from.file}.
+#'				\code{\link{setup.simplification}} or \code{\link{setup.simplification.from.file}}.
 #'	@usage		get.observations(x)
 #'	@return		A #data-by-1 vector storing the observations.
 #'	@export	
@@ -274,10 +307,9 @@ get.observations <- function(x)
 #'	Get the quantity of information for each element
 #'
 #'	@param	x	An object of class simplification, created through
-#'				\code{setup.simplification} or \code{setup.simplification.from.file}.
+#'				\code{\link{setup.simplification}} or \code{\link{setup.simplification.from.file}}.
 #'	@usage		get.quantity.of.information(x)
-#'	@return		A #elements-by-1 vector, storing the quantity of
-#'				information for each element.
+#'	@return		A #elements-by-1 vector, storing the quantity of information for each element.
 #'	@export
 
 get.quantity.of.information <- function(x)
@@ -295,9 +327,10 @@ get.quantity.of.information <- function(x)
 #'	Get surface mesh
 #'
 #'	@param	x	An object of class simplification, created through
-#'				\code{setup.simplification} or \code{setup.simplification.from.file}.
+#'				\code{\link{setup.simplification}} or \code{\link{setup.simplification.from.file}}.
 #'	@usage		get.surface.mesh(x)
-#'	@return		A SURFACE_MESH object.
+#'	@return		A SURFACE_MESH object, whose order is compliant with the mesh used to
+#'				initialize the simplification framework.
 #'	@export
 
 get.surface.mesh <- function(x)
@@ -328,6 +361,56 @@ get.surface.mesh <- function(x)
 		ntriangles = dim(triangles)[1], triangles = triangles, order = x$order)
 	class(out) <- "SURFACE_MESH"
 	return(out)
+}
+
+
+#'	Plot a mesh in a 3D perspective
+#'
+#'	@param	x		An object of class simplification, created through
+#'					\code{\link{setup.simplification}} or \code{\link{setup.simplification.from.file}}.
+#'	@param	phi		Colatitude (in degrees) characterizing the viewing direction; default is 40.
+#'	@param	theta	Longitude (in degrees) characterizing the viewing direction; default is 40.
+#'	@param	...		Additional arguments passed to the plotting methods; these include:
+#'					xlim, ylim, zlim, xlab, ylab, zlab, main, sub, r, d, scale, expand, box, axes, nticks, ticktype.
+#'	@description	Plot the three-dimensional surface mesh held by an object of class simplification.
+#'					The package plot3D is used.
+#'	@usage			plot.surface.mesh(x, phi = 40, theta = 40, ...)
+#'	@export
+#'	@examples
+#'	## Instantiate an object of class simplification for the simplification of a pawn geometry; 
+#'	## suppose that the components of the edge cost function are equally weighted
+#'	data(pawn)
+#'	obj <- setup.simplification(mesh)
+#'	## Plot the original mesh
+#'	plot.surface.mesh(obj, main = "Original mesh, 2522 nodes")
+#'	## Run the simplification strategy, reducing the mesh down to n = 1500 nodes
+#'	run.simplification(obj, 1500)
+#'	## Plot the simplified mesh
+#'	plot.surface.mesh(obj, main = "Simplified mesh, 1500 nodes")
+#'	## Resume the simplification procedure, reducing the mesh down to n = 1000 nodes
+#'	run.simplification(obj, 1000)
+#'	## Plot the simplified mesh
+#'	plot.surface.mesh(obj, main = "Simplified mesh, 1000 nodes")
+
+plot.surface.mesh <- function(x, phi = 40, theta = 40, ...)
+{
+	# Preliminary check
+	if (class(x) != "simplification")
+		stop("The function takes an object of class simplification as input.")
+				
+	# Get triangles
+	trs <- x$simplifier$getElemsVertices()
+	
+	# Array of colors
+	n <- (nrow(trs)+1)/4
+	clr <- matrix("blue", nrow = n, ncol = 1)
+	
+	# Plot
+	polygon3D (x = trs[,1], y = trs[,2], z = trs[,3], ...,
+      	colvar = NULL, phi = phi, theta = theta,
+      	col = clr, NAcol = "white", breaks = NULL,
+      	facets = FALSE, bty = "b", pty = "s",
+      	add = FALSE, plot = TRUE)
 }
 
 
