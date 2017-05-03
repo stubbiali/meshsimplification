@@ -96,7 +96,7 @@ int main(int argc, char * argv[])
 	#endif
 	
 	simplification<Triangle, MeshType::DATA, DataGeo> simplifier(iFile);
-	simplifier.simplificate(n, fixedElem, oFile);
+	simplifier.simplify(n, fixedElem, oFile);
 		
 	#ifdef NDEBUG
 	high_resolution_clock::time_point stop = high_resolution_clock::now();

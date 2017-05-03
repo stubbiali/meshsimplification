@@ -1,5 +1,5 @@
 An iterative simplification procedure for surface grids augmented with distributed data
-=====================================================================
+=======================================================================================
 
 For a detailed description of the method, please refer to:
 
@@ -8,7 +8,7 @@ For a detailed description of the method, please refer to:
 Applied Numerical Mathematics 90:111-131, 2015.
     
 C++ library
----------------------------------------------------------------------
+-----------
 
 The main output is the `meshsimplification` library.
 The C++ code for the library, as well as that one for the applications and the tests, comes with the following folders:
@@ -72,32 +72,8 @@ To clean and disinstall the `meshsimplification` library, type
 Administrator access rights might be required.
 
 R package
-------------------------------------------------------------------------------
+---------
 
-This project comes also with the R package `MeshDataSimplification`, wrapping the C++ library `meshsimplification`, thus providing a high-level access to its functionalities. To expose the C++ code to R, the `Rcpp` and `RcppEigen` API is used.
-
-The source code for the package is placed in the folder `RPackage/MeshDataSimplification`and its subfolders, namely:
-- `include` : C++ header files for the package;
-- `src` : C++ source files;
-- `R` : R source files.
-	
-To build, compile and install the package, first install the `meshsimplification` library through
-
-	make install
-	
-from the project root folder. Then, move to the `RPackage/MeshDataSimplification` folder and type
-
-	R -e "library(devtools); install()" --silent
-	
-For both commands above, you may need administrator privileges. Furthermore, observe that the R package `devtools` is required. To check whether the installation has been successfull, run one of the scripts contained in the folder `RPackage/RScript`, aiming to exemplify the use of the functions provided by the package. 
-
-Lastly, to build the Roxygen documentation and place it in `RPackage/MeshDataSimplification/man/`, run
-
-	R -e "library(devtools); document()" --silent
-
-
-
-
-
+This project comes also with the R package `MeshDataSimplification`, wrapping the C++ library `meshsimplification`, thus providing a high-level access to its functionalities. The files for the package are placed in the folder `RPackage/MeshDataSimplification`; for further details, please refer to the README file therein.
 
 

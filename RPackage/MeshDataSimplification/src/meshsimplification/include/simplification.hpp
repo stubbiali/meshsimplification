@@ -352,7 +352,7 @@ namespace geometry
 				\param enableDontTouch	TRUE if one element must be fixed,
 										FALSE otherwise
 				\param file				path to output file; if empty, nothing is printed */
-			void simplificate(const UInt & numNodesMax, const bool & enableDontTouch,
+			void simplify(const UInt & numNodesMax, const bool & enableDontTouch,
 				const string & file = "");
 												
 		private:

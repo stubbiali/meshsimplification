@@ -30,10 +30,10 @@ inline int RcppSimplification::getNumData() const
 // Run the simplification
 //
 
-inline void RcppSimplification::simplificate(const int & numNodesMax, 
+inline void RcppSimplification::simplify(const int & numNodesMax, 
 	const CharacterVector & file)
 {
-	simplifier.simplificate(numNodesMax, true, as<string>(file));
+	simplifier.simplify(numNodesMax, true, as<string>(file));
 }
 
 #endif

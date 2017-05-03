@@ -20,6 +20,8 @@ wequi <- 1/3
 # Initialize simplification framework and plot initial mesh
 #
 
+library(methods)
+library(utils)
 require(MeshDataSimplification)
 
 if (dataset == "pawn")
@@ -36,14 +38,14 @@ plot.surface.mesh(x, main = sprintf("Original mesh, %i nodes", mesh$nnodes))
 # Simplified the mesh, then plot it again
 #
 
-run.simplification(x, n1)
+y1 <- run.simplification(x, n1)
 plot.surface.mesh(x, main = sprintf("Simplified mesh, %i nodes", n1))
 
 #
 # Resume the simplification, then plot the final mesh
 #
 
-run.simplification(x, n2)
+y2 <- run.simplification(x, n2)
 plot.surface.mesh(x, main = sprintf("Simplified mesh, %i nodes", n2))
 
 

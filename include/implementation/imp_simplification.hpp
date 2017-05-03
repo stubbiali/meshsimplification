@@ -1075,7 +1075,7 @@ namespace geometry
 	//
 	
 	template<MeshType MT, typename CostClass>
-	void simplification<Triangle, MT, CostClass>::simplificate(const UInt & numNodesMax,
+	void simplification<Triangle, MT, CostClass>::simplify(const UInt & numNodesMax,
 		const bool & enableDontTouch, const string & file)
 	{				
 		// Check if the current number of nodes is below the threshold

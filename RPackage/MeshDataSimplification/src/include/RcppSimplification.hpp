@@ -148,7 +148,7 @@ class RcppSimplification
 		/*!	Run the simplification process.
 			\param numNodesMax	final number of nodes
 			\param file	 		path to file which will store the final mesh */
-		void simplificate(const int & numNodesMax, const CharacterVector & file);
+		void simplify(const int & numNodesMax, const CharacterVector & file);
 };
 
 /*!	Auxiliary function, building a mesh with linear elements from a mesh
@@ -235,8 +235,8 @@ RCPP_MODULE(mod_RcppSimplification)
 			"Return a quadratic Finite Elements mesh, built from the "
 			"linear Finite Elements mesh stored by the C++ simplification class.")
 		 
-		// Expose method simplificate
-		.method("simplificate", &RcppSimplification::simplificate, 
+		// Expose method simplify
+		.method("simplify", &RcppSimplification::simplify, 
 			"Run the simplification procedure. This method takes in input "
 			"the final number of nodes and a string with the path to the "
 			"output mesh (.inp file format supported).")

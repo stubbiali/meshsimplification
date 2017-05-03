@@ -151,7 +151,7 @@ setup.simplification <- function(mesh, loc = NULL, val = NULL, wgeom = 1/3, wdis
 #'						mesh will be stored; .inp file format supported. If the path
 #'						is not provided, the mesh will no printed.
 #'	@description		Function running the simplification process by invoking the 
-#'						method \code{simplificate} of the \code{RcppSimplification}
+#'						method \code{simplify} of the \code{RcppSimplification} class
 #'						through the attribute \code{simplifier} of the \code{simplification}
 #'						object given as argument. Note that the procedure is completely 
 #'						carried out at the C++ level by the \code{meshsimplification} 
@@ -187,7 +187,7 @@ run.simplification <- function(x, numNodesMax, file = '')
 		stop("The function takes an object of class simplification as input.")
 		
 	# Run the simplification procedure
-	x$simplifier$simplificate(numNodesMax, file)
+	x$simplifier$simplify(numNodesMax, file)
 	
 	# Create SURFACE_MESH object
 	mesh <- get.surface.mesh(x)

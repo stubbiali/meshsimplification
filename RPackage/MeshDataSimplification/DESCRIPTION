@@ -20,10 +20,9 @@ Depends:
 	R (>= 3.0.2), Rcpp (>= 0.9.11), plot3D
 LinkingTo: 
 	Rcpp (>= 0.9.11), RcppEigen
-Description: Iterative simplification strategy for surface triangular grids augmented 
-	with distributed data. Each iteration corresponds to an edge collapse where
-	the selection of the edge to contract derives from a cost functional based 
-	on both geometric and statistical-based considerations. 
+Description: Iterative simplification strategy for surface triangular grids augmented with distributed data. 
+	Each iteration corresponds to an edge collapse where the selection of the edge to contract derives from 
+	a cost functional based on both geometric and statistical-based considerations. 
 	The library can	handle both zero and higher genus surfaces.
 	For a detailed description of the algorithm, please refer to:
 	Dassi, F., Ettinger, B., Perotto, S., Sangalli, L.M. (2015),

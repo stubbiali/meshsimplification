@@ -166,8 +166,6 @@ dynamic: folders $(D_LIB_OBJ)
 	@echo -n "Creating lib$(LIB).so$(VRS) ... "
 	@$(CXX) $(CXXFLAGS) -shared 	-o	lib$(LIB).so$(VRS)	$(D_LIB_OBJ)	$(LDFLAGS_LIB) 
 	@mv -f lib$(LIB).so$(VRS) $(LIB_DIR)
-	@cp -r -f $(LIB_INC_DIR)/*  $(R_PACKAGE_INC_DIR)/$(LIB)
-	@cp -f $(LIB_DIR)/lib$(LIB).so$(VRS) $(R_PACKAGE_LIB_DIR)
 	@echo "done"
 	@echo "\033[92mDynamic version of meshsimplification library successfully built\n\033[0m"
 	
